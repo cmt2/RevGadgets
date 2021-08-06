@@ -21,8 +21,9 @@
 #' state labels. Ignored if tip_labels_states = NULL.
 #' @param node_labels_as (character; NULL) Optional plotting of text at nodes.
 #' Possible values are "state" for the MAP ancestral states, "node_posterior"
-#' for the posterior probability of the node on the tree, or NULL for not
-#' plotting any text at the nodes (default).
+#' for the posterior probability of the node on the tree, “state_posterior” 
+#' for the posterior probability of the MAP, or NULL for not plotting any
+#' text at the nodes (default).
 #' @param node_labels_size (numeric; 2) Size of node labels text. Ignored if
 #' node_labels_as = NULL.
 #' @param node_labels_offset (numeric; 0.1) Horizontal offset of node labels
