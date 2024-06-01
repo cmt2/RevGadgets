@@ -13,7 +13,9 @@ on:
 name: R-CMD-check
 
 env:
-  R_BIOC_VERSION: 3.16
+  R_BIOC_VERSION: 3.19
+
+permissions: read-all
 
 jobs:
   R-CMD-check:
@@ -35,8 +37,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@main
-
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -50,8 +51,8 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          cache: false
 
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
