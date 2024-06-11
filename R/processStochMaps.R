@@ -98,7 +98,7 @@ processStochMaps <- function(tree,
         
         # add a root edge
         root_edge_samples <- sapply(simmap, function(map) {
-            paste0("{", grDevices::rgb(names(map$maps[[1]]), n = 1), ",0}")
+            return(paste0("{", tail(names(map$maps[[1]]), n = 1), ",0}"))
         })
         samples <- cbind(samples, root_edge_samples)
         

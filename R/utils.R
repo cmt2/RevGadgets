@@ -944,10 +944,10 @@ reorder_treedata <- function(tdObject, order = "postorder") {
 
 .matchNodesTreeData <- function(treedata, phy) {
   # get some useful info
-  num_sampled_anc <- sum(phy$node.label != "")
   num_tips        <- length(phy$tip.label)
   num_nodes       <- phy$Nnode
   sampled_ancs    <- which(tabulate(phy$edge[, 1]) == 1)
+  num_sampled_anc <- length(sampled_ancs)
   tip_indexes     <- 1:(num_tips + num_sampled_anc)
   node_indexes    <- (num_tips + num_sampled_anc) + num_nodes:1
 
