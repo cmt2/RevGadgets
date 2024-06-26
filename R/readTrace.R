@@ -1,6 +1,6 @@
 #' Read trace
 #'
-#' Reads in MCMC log files
+#' Reads in MCMC log files or JSON files
 #'
 #' Reads in one or multiple MCMC log files from the same analysis
 #' and discards a user-specified burn-in, compatible with multiple monitor
@@ -10,12 +10,12 @@
 #'
 #' @param paths (vector of character strings; no default) File path(s) to trace
 #' file.
-#' @param format (single character string; default = simple) Indicates type of
+#' @param format (single character string; default = "simple") Indicates type of
 #' MCMC trace, complex indicates cases where trace contains vectors of vectors/
 #' matrices - mnStochasticVariable monitor will sometimes be of this type.
-#' @param delim (single character string; default = "\\t") Delimiter of file.
+#' @param delim (single character string; default = "\t") Delimiter of file.
 #' @param burnin (single numeric value; default = 0.1) Fraction of generations
-#' to  discard (if value provided is between 0 and 1) or number of generations
+#' to discard (if value provided is between 0 and 1) or number of generations
 #' (if value provided is greater than 1).
 #' @param check.names (logical; default = FALSE) Passed to utils::read.table();
 #' indicates if utils::read.table() should check column names and replace
@@ -24,149 +24,143 @@
 #'
 #' @return List of dataframes (of length 1 if only 1 log file provided).
 #'
-#' @examples
-#' # read and process a single trace file
-#'
-#' \donttest{
-#' # download the example dataset to working directory
-#' url_gtr <-
-#'    "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR.log"
-#' dest_path_gtr <- "primates_cytb_GTR.log"
-#' download.file(url_gtr, dest_path_gtr)
-#'
-#' # to run on your own data, change this to the path to your data file
-#' file_single <- dest_path_gtr
-#'
-#' one_trace <- readTrace(paths = file_single)
-#'
-#' # remove file
-#' # WARNING: only run for example dataset!
-#' # otherwise you might delete your data!
-#' file.remove(dest_path_gtr)
-#'
-#' # read and process multiple trace files, such as from multiple runs of
-#' # the same analysis
-#'
-#' # download the example dataset to working directory
-#' url_1 <-
-#' "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_1.log"
-#' dest_path_1 <- "primates_cytb_GTR_run_1.log"
-#' download.file(url_1, dest_path_1)
-#'
-#' url_2 <-
-#' "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_2.log"
-#' dest_path_2 <- "primates_cytb_GTR_run_2.log"
-#' download.file(url_2, dest_path_2)
-#'
-#' # to run on your own data, change this to the path to your data file
-#' file_1 <- dest_path_1
-#' file_2 <- dest_path_2
-#'
-#' # read in the multiple trace files
-#' multi_trace <- readTrace(path = c(file_1, file_2), burnin = 0.0)
-#'
-#' # remove files
-#' # WARNING: only run for example dataset!
-#' # otherwise you might delete your data!
-#' file.remove(dest_path_1, dest_path_2)
-#' }
-#'
 #' @export
-
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
                       burnin = 0.1,
                       check.names = FALSE,
                       ...) {
-  # enforce argument matching
-
-  character_paths_are_strings <- is.character(paths)
-  if (any(character_paths_are_strings == FALSE) == TRUE) {
-    # print out the ones that are not character strings
-    stop(
-      paste0("Some paths are not character strings:",
-        paste0("\t", paths[character_paths_are_strings == FALSE]),
-        sep = "\n")
-    )
+  # Enforce argument matching
+  if (!is.character(paths)) {
+    stop("All paths must be character strings.")
   }
-
-  do_files_exist <- file.exists(paths)
-  if (any(do_files_exist == FALSE) == TRUE) {
-    # print out paths to files that don't exist
-    stop(
-      paste0("Some files do not exist:",
-        paste0("\t", paths[do_files_exist == FALSE]), sep = "\n")
-    )
+  # Check if files exist
+  if (!all(file.exists(paths))) {
+    missing_files <- paths[!file.exists(paths)]
+    stop("The following files do not exist:\n", paste(missing_files, collapse = "\n"))
   }
-
+  # Ensure format is either "simple" or "complex"
   format <- match.arg(format, choices = c("simple", "complex"))
-
-  if (is.character(delim) == FALSE)
-    stop("delim must be a single character string")
-
-  if (is.numeric(burnin) == FALSE)
-    stop("burnin must be a single numeric value")
-  if (burnin < 0)
-    stop("burnin must be a positive value")
-
-  num_paths <- length(paths)
-
-  # check that the file headings match for all traces
-  header <- vector("list", num_paths)
-  for (i in 1:num_paths) {
-    header[[i]] <- colnames(
-      utils::read.table(
-        file = paths[i],
-        header = TRUE,
-        sep = delim,
-        check.names = check.names,
-        nrows = 0,
-        ...
-      )
-    )
+  if (!is.character(delim) || nchar(delim) != 1) {
+    stop("Delimiter must be a single character string.")
   }
-
-  all_headers <- unique(unlist(header))
-  for (i in seq_len(length(header))) {
-    if (setequal(all_headers, header[[i]]) == FALSE) {
-      stop("Not all headers of trace files match")
-    }
+  if (!is.numeric(burnin) || length(burnin) != 1 || burnin < 0) {
+    stop("Burnin must be a single positive numeric value.")
   }
-
-  # read in the traces
-  if (format == "simple") {
-    output <- vector("list", num_paths)
-    for (i in 1:num_paths) {
-      message(paste0(paste0("Reading in log file ", i), "\n", sep = ""))
-
-      out <- utils::read.table(
-        file = paths[i],
-        header = TRUE,
-        sep = delim,
-        check.names = check.names,
-        ...
-      )
-
-      if (burnin >= nrow(out))
-        stop("Burnin larger than provided trace file")
-
-      if (burnin >= 1) {
-        output[[i]] <- out[(burnin + 1):nrow(out),]
-      } else if (burnin < 1 & burnin > 0) {
-        discard <- ceiling(burnin * nrow(out))
-        output[[i]] <- out[(discard + 1):nrow(out),]
-      } else if (burnin == 0) {
-        output[[i]] <- out
-      } else {
-        stop("What have you done?")
+  # Helper function to read data based on file extension
+  read_data <- function(path, delim, check.names, ...) {
+    ext <- tools::file_ext(path)
+    if (ext == "json") {
+      # Read JSON lines file directly into a list
+      json_data <- stream_in(file(path), simplifyVector = FALSE)
+      # Initialize an empty dataframe with headers
+      headers <- c("Iteration", "Likelihood", "Posterior", "Prior",
+                   "alpha_morpho", "alpha_morpho2", "br_len_lambda",
+                   "rates_morpho1", "rates_morpho2", "tree_length")
+      data <- matrix(NA, nrow = length(headers), ncol = length(json_data))
+      # Extract data from each JSON object
+      for (i in seq_along(json_data)) {
+        obj <- json_data[[i]]
+        data[, i] <- c(obj$Iteration, obj$Likelihood, obj$Posterior, obj$Prior,
+                       obj$alpha_morpho, obj$alpha_morpho2, obj$br_len_lambda,
+                       obj$rates_morpho[1], obj$rates_morpho2[1], obj$tree_length)
       }
+      # Convert to dataframe and transpose
+      data <- as.data.frame(data)
+      colnames(data) <- NULL
+      rownames(data) <- headers
+      return(data)
+    } else {
+      return(utils::read.table(
+        file = path,
+        header = TRUE,
+        sep = delim,
+        check.names = check.names,
+        ...
+      ))
     }
-  } else if (format == "complex") {
-    stop("Complex trace type currently not supported")
-  } else {
-    stop("Format is not of type simple or complex")
   }
-
+  # Check that the file headings match for all traces
+  headers <- lapply(paths, function(path) {
+    data <- read_data(path, delim, check.names, nrows = 0, ...)
+    colnames(data)
+  })
+  unique_headers <- unique(headers)
+  if (length(unique_headers) > 1) {
+    stop("Not all headers of trace files match.")
+  }
+  # Read in the traces
+  output <- lapply(seq_along(paths), function(i) {
+    message(paste0("Reading in log file ", i))
+    out <- read_data(paths[i], delim, check.names, ...)
+    if (burnin >= nrow(out)) {
+      stop("Burnin larger than provided trace file.")
+    }
+    if (burnin >= 1) {
+      out <- out[(burnin + 1):nrow(out), ]
+    } else if (burnin > 0) {
+      discard <- ceiling(burnin * nrow(out))
+      out <- out[(discard + 1):nrow(out), ]
+    }
+    return(out)
+  })
   return(output)
 }
+# Load necessary libraries if not already loaded
+library(tidyverse)
+library(jsonlite)
+
+# Function to read and parse JSON lines file
+readAndParseJSON <- function(file) {
+  
+  # Function to safely parse each line of JSON
+  parse_json_safe <- function(line) {
+    tryCatch(
+      fromJSON(line, flatten = TRUE),
+      error = function(e) {
+        message("Error parsing line: ", line)
+        NULL
+      }
+    )
+  }
+  
+  # Read JSON lines file line by line
+  json_lines <- readLines(file)
+  
+  # Parse each line of JSON data
+  parsed_data <- map(json_lines, parse_json_safe)
+  
+  # Filter out any NULL values that failed to parse
+  parsed_data <- compact(parsed_data)
+  
+  # Combine all parsed JSON objects into a single data frame
+  df <- bind_rows(parsed_data)
+  
+  # Unnest the list columns (customize as per your needs)
+  df_long <- df %>%
+    unnest(cols = c(rates_morpho, rates_morpho2), names_sep = "_")
+  
+  return(df_long)
+}
+
+# Example usage:
+file <- "simplerev/simple/part_run_1.log"
+parsed_df <- readAndParseJSON(file)
+
+# View the parsed and unnested data frame
+View(parsed_df)
+
+#how to call the function
+output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
+                    format = "simple",
+                    delim = "\t",
+                    burnin = 0.1,
+                    check.names = FALSE)
+# Display formatted output
+for (i in seq_along(output)) {
+  cat(paste("File", i, "\n"))
+  print(output[[i]], row.names = TRUE)
+  cat("\n")
+}
+print(output)
