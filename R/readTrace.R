@@ -57,7 +57,7 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
   }
   
   # Ensure format is either "simple" or "complex"
-  format <- match.arg(format, choices = c("simple", "complex"))
+  format <- match.arg(format, choices = c("simple", "complex", "json"))
   if (!is.character(delim) || nchar(delim) != 1) {
     stop("Delimiter must be a single character string.")
   }
@@ -66,9 +66,8 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
   }
   
   # Helper function to read data based on file extension
-  read_data <- function(path, delim, check.names, ...) {
-    ext <- tools::file_ext(path)
-    if (ext == "json") {
+  read_data <- function(path,format, delim, check.names, ...) {
+    if (format == "json") {
       return(readAndParseJSON(path))
     } else {
       return(utils::read.table(
@@ -83,7 +82,7 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
   
   # Check that the file headings match for all traces
   headers <- lapply(paths, function(path) {
-    data <- read_data(path, delim, check.names, nrows = 0, ...)
+    data <- read_data(path,format, delim, check.names, nrows = 0, ...)
     colnames(data)
   })
   unique_headers <- unique(headers)
@@ -94,7 +93,7 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
   # Read in the traces
   output <- lapply(paths, function(path) {
     message(paste0("Reading log file: ", path))
-    data <- read_data(path, delim, check.names, ...)
+    data <- read_data(path, format,  delim, check.names, ...)
     
     # Apply burnin if specified
     if (burnin >= nrow(data)) {
@@ -127,7 +126,7 @@ View(parsed_df)
 
 # How to call the function
 output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
-                    format = "simple",
+                    format = "json",
                     delim = "\t",
                     burnin = 0.1,
                     check.names = FALSE)
