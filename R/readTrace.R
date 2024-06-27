@@ -22,10 +22,9 @@
 #' syntactically invalid characters.
 #' @param ... (various) Additional arguments passed to utils::read.table().
 #'
-#' @return List of dataframes (of length 1 if only 1 log file provided).
+#' @return List of dataframes .
 #'
 #' @export
-
 
 
 
