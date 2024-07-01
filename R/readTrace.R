@@ -54,16 +54,20 @@ readAndParseJSON <- function(file) {
   # Filter out any NULL values that failed to parse
   parsed_data <- compact(parsed_data)
   
-  # Convert list columns to comma-separated strings
-  parsed_data <- lapply(parsed_data, function(row) {
-    row <- lapply(row, function(value) {
-      if (is.list(value)) {
-        paste(unlist(value), collapse = ",")
+  # Convert list columns to separate columns
+  parsed_data <- map(parsed_data, function(row) {
+    flat_row <- list()
+    for (name in names(row)) {
+      if (is.list(row[[name]])) {
+        values <- unlist(row[[name]])
+        for (i in seq_along(values)) {
+          flat_row[[paste(name, i, sep = "_")]] <- values[[i]]
+        }
       } else {
-        value
+        flat_row[[name]] <- row[[name]]
       }
-    })
-    return(row)
+    }
+    return(flat_row)
   })
   
   # Combine all parsed JSON objects into a single data frame
