@@ -2,6 +2,7 @@
 library(tidyverse)
 library(jsonlite)
 library(dplyr)
+
 # Function to read and parse JSON lines file
 readAndParseJSON <- function(file) {
   # Function to safely parse each line of JSON
@@ -35,6 +36,7 @@ readAndParseJSON <- function(file) {
   df <- bind_rows(parsed_data)
   return(df)
 }
+
 # Function to read trace files
 readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, check.names = FALSE, ...) {
   # Enforce argument matching
@@ -54,6 +56,7 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
   if (!is.numeric(burnin) || length(burnin) != 1 || burnin < 0) {
     stop("Burnin must be a single positive numeric value.")
   }
+  
   # Helper function to read data based on file extension
   read_data <- function(format, path, delim, check.names, ...) {
     if (format == "json") {
@@ -68,6 +71,7 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
       ))
     }
   }
+  
   # Check that the file headings match for all traces
   headers <- lapply(paths, function(path) {
     data <- read_data(format, path, delim, check.names, nrows = 0, ...)
@@ -77,6 +81,7 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
   if (length(unique_headers) > 1) {
     stop("Not all headers of trace files match.")
   }
+  
   # Read in the traces
   output <- lapply(paths, function(path) {
     message(paste0("Reading log file: ", path))
@@ -93,6 +98,7 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
     }
     return(data)
   })
+  
   # Return each data frame separately (if multiple paths provided)
   if (length(output) > 1) {
     return(output)
@@ -100,17 +106,20 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
     return(output[[1]])
   }
 }
+
 # Example usage:
 file <- "simple/part_run_1.log"
 parsed_df <- readAndParseJSON(file)
 # View the parsed and unnested data frame
 View(parsed_df)
+
 # How to call the function
 output <- readTrace(paths = c("simple/part_run_1.log", "simple/part_run_2.log"),
                     format = "json",
                     delim = "\t",
                     burnin = 0.1,
                     check.names = FALSE)
+
 # Display formatted output using a loop
 for (i in seq_along(output)) {
   cat(paste("File", i, "\n"))
