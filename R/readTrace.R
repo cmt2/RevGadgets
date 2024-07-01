@@ -1,3 +1,8 @@
+
+library(tidyverse)
+library(jsonlite)
+library(dplyr)
+
 #' Read trace
 #'
 #' Reads in MCMC log files or JSON files
@@ -25,12 +30,33 @@
 #' @return List of dataframes .
 #'
 #' @export
+#' #' \donttest{
+#' # Example usage:
+#' file <- "simplerev/simple/part_run_1.log"
+#' parsed_df <- readAndParseJSON(file)
+#' 
+#' # View the parsed and unnested data frame
+#' View(parsed_df)
+
+#' # How to call the function
+#' output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
+#'                     format = "json",
+#'                     delim = "\t",
+#'                     burnin = 0.1,
+#'                     check.names = FALSE)
+#' 
+#' # Display formatted output using a loop
+#' for (i in seq_along(output)) {
+#'   cat(paste("File", i, "\n"))
+#'   print(output[[i]], row.names = TRUE)
+#'   cat("\n")
+#' }
+#' }
+#'
+#' @export
 
 
 
-library(tidyverse)
-library(jsonlite)
-library(dplyr)
 
 # Function to read and parse JSON lines file
 readAndParseJSON <- function(file) {
@@ -47,9 +73,26 @@ readAndParseJSON <- function(file) {
   
   # Read JSON lines file line by line
   json_lines <- readLines(file)
+  # Initialize an empty list to store parsed data
+  parsed_data <- list()
   
-  # Parse each line of JSON data
-  parsed_data <- map(json_lines, parse_json_safe)
+  # Function to check if a line is metadata (to skip very first line showing fields, formats, etc. )
+  is_metadata_line <- function(line) {
+    tryCatch({
+      json <- fromJSON(line, simplifyVector = TRUE)
+      # Check if the line contains specific metadata keys to skip
+      any(names(json) %in% c("atomic", "fields", "format"))
+    }, error = function(e) {
+      return(FALSE)
+    })
+  }
+  
+  # Skip metadata lines
+  for (line in json_lines) {
+    if (!is_metadata_line(line)) {
+      parsed_data <- c(parsed_data, list(parse_json_safe(line)))
+    }
+  }
   
   # Filter out any NULL values that failed to parse
   parsed_data <- compact(parsed_data)
