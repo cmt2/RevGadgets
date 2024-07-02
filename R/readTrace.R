@@ -29,15 +29,8 @@ library(dplyr)
 #'
 #' @return List of dataframes .
 #'
-#' @export
-#' #' \donttest{
-#' # Example usage:
-#' file <- "simplerev/simple/part_run_1.log"
-#' parsed_df <- readAndParseJSON(file)
 #' 
-#' # View the parsed and unnested data frame
-#' View(parsed_df)
-
+#'  \donttest{
 #' # How to call the function
 #' output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
 #'                     format = "json",
@@ -198,24 +191,15 @@ readTrace <- function(paths,
     return(output[[1]])
   }
 }
+  
+  
+  # Example usage:
+   file <- readline(prompt = "Enter file path to JSON :")
+   parsed_df <- readAndParseJSON(file)
+  
+  
+  # View the parsed and unnested data frame
+   View(parsed_df)
 
-# Example usage:
-file <- "simplerev/simple/part_run_1.log"
-parsed_df <- readAndParseJSON(file)
 
-# View the parsed and unnested data frame
-View(parsed_df)
 
-# How to call the function
-output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
-                    format = "json",
-                    delim = "\t",
-                    burnin = 0.1,
-                    check.names = FALSE)
-
-# Display formatted output using a loop
-for (i in seq_along(output)) {
-  cat(paste("File", i, "\n"))
-  print(output[[i]], row.names = TRUE)
-  cat("\n")
-}
