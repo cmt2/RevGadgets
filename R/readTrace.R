@@ -141,22 +141,11 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
   }
 }
 
-# Example usage
 file <- "simple/part_run_1.log"
 parsed_df <- readAndParseJSON(file)
 # View the parsed and unnested data frame
 View(parsed_df)
 
-# How to call the function
-output <- readTrace(paths = c("simple/part_run_1.log", "simple/part_run_2.log"),
-                    format = "simple",
-                    delim = "\t",
-                    burnin = 0.1,
-                    check.names = FALSE)
 
-# Display formatted output using a loop
-for (i in seq_along(output)) {
-  cat(paste("File", i, "\n"))
-  print(output[[i]], row.names = TRUE)
-  cat("\n")
-}
+
+
