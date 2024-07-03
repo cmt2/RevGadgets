@@ -1,7 +1,3 @@
-# Load necessary libraries
-library(jsonlite)
-library(dplyr)
-
 #' Read trace
 #'
 #' Reads in MCMC log files or JSON files
@@ -27,7 +23,7 @@ library(dplyr)
 #' @param ... (various) Additional arguments passed to utils::read.table().
 #'
 #' @return List of dataframes.
-#'
+#' @export
 #' @examples
 #' \donttest{
 #' # How to call the function
@@ -36,7 +32,7 @@ library(dplyr)
 #'                     delim = "\t",
 #'                     burnin = 0.1,
 #'                     check.names = FALSE)
-#' 
+#'
 #' # Display formatted output using a loop
 #' for (i in seq_along(output)) {
 #'   cat(paste("File", i, "\n"))
@@ -45,7 +41,7 @@ library(dplyr)
 #' }
 #' # Example usage:
 #' file <- file.choose()
-#' 
+#'
 #' if(length(file) == 0) {
 #'   stop("No file is imported")
 #' }
@@ -56,21 +52,21 @@ library(dplyr)
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
-                      burnin = 0.1, 
+                      burnin = 0.1,
                       check.names = FALSE, ...) {
-  
+
   # Enforce argument matching and checks
   if (!is.character(paths)) {
     stop("All paths must be character strings.")
-    
+
   }
-  
+
   # Check if files exist
   if (!all(file.exists(paths))) {
     missing_files <- paths[!file.exists(paths)]
     stop("The following files do not exist:\n", paste(missing_files, collapse = "\n"))
   }
-  
+
   # Ensure format is either "simple" or "complex" or "json"
   format <- match.arg(format, choices = c("simple", "complex", "json"))
   if (!is.character(delim) || nchar(delim) != 1) {
@@ -79,7 +75,7 @@ readTrace <- function(paths,
   if (!is.numeric(burnin) || length(burnin) != 1 || burnin < 0) {
     stop("Burnin must be a single positive numeric value.")
   }
-  
+
   # Helper function to read data based on file extension
   read_data <- function(path, format, delim, check.names, ...) {
     if (format == "json") {
@@ -94,7 +90,7 @@ readTrace <- function(paths,
       ))
     }
   }
-  
+
   # Check that the file headings match for all traces
   headers <- lapply(paths, function(path) {
     data <- read_data(path, format, delim, check.names, nrows = 0, ...)
@@ -104,12 +100,12 @@ readTrace <- function(paths,
   if (length(unique_headers) > 1) {
     stop("Not all headers of trace files match.")
   }
-  
+
   # Read in the traces
   output <- lapply(paths, function(path) {
     message(paste0("Reading log file: ", path))
     data <- read_data(path, format, delim, check.names, ...)
-    
+
     # Apply burnin if specified
     if (burnin >= nrow(data)) {
       stop("Burnin larger than provided trace file.")
@@ -120,10 +116,10 @@ readTrace <- function(paths,
       discard <- ceiling(burnin * nrow(data))
       data <- data[(discard + 1):nrow(data), ]
     }
-    
+
     return(data)
   })
-  
+
   # Return each data frame separately (if multiple paths provided)
   if (length(output) > 1) {
     return(output)
