@@ -34,7 +34,7 @@ Imports: ape (>= 5.4), phytools (>= 0.7-70), dplyr (>= 1.0.0),
          tidyr (>= 1.1.0), tibble (>= 3.0.1), gginnards (>= 0.0.3),
           ggplotify (>= 0.0.5), ggpp, ggimage,
          png (>= 0.1-7), stats (>= 4.0.1), utils (>= 4.0.1), 
-         grDevices (>= 4.0.1), deeptime (>= 0.1.0), scales (>= 1.1.1)
+         grDevices (>= 4.0.1), deeptime (>= 0.1.0), scales (>= 1.1.1), jsonlite (>= 1.8.8)
 Suggests: testthat,
           knitr,
           rmarkdown,

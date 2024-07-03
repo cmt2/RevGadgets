@@ -1,7 +1,10 @@
-
+# Load necessary libraries
 library(tidyverse)
 library(jsonlite)
 library(dplyr)
+
+# Source the read_and_parse_json.R file to load readAndParseJSON function
+source("R/read_parse_json.R")
 
 #' Read trace
 #'
@@ -44,73 +47,15 @@ library(dplyr)
 #'   print(output[[i]], row.names = TRUE)
 #'   cat("\n")
 #' }
-#' }
-#'
-#' @export
+#' # Example usage:
+file <- readline(prompt= "Enter file path to JSONfile  :")
+parsed_df <- readAndParseJSON(file)
+# View the parsed and unnested data frame
+View(parsed_df)
 
 
 
 
-# Function to read and parse JSON lines file
-readAndParseJSON <- function(file) {
-  # Function to safely parse each line of JSON
-  parse_json_safe <- function(line) {
-    tryCatch(
-      fromJSON(line, simplifyVector = FALSE),
-      error = function(e) {
-        message("Error parsing line: ", line)
-        NULL
-      }
-    )
-  }
-  
-  # Read JSON lines file line by line
-  json_lines <- readLines(file)
-  # Initialize an empty list to store parsed data
-  parsed_data <- list()
-  
-  # Function to check if a line is metadata (to skip very first line showing fields, formats, etc. )
-  is_metadata_line <- function(line) {
-    tryCatch({
-      json <- fromJSON(line, simplifyVector = TRUE)
-      # Check if the line contains specific metadata keys to skip
-      any(names(json) %in% c("atomic", "fields", "format"))
-    }, error = function(e) {
-      return(FALSE)
-    })
-  }
-  
-  # Skip metadata lines
-  for (line in json_lines) {
-    if (!is_metadata_line(line)) {
-      parsed_data <- c(parsed_data, list(parse_json_safe(line)))
-    }
-  }
-  
-  # Filter out any NULL values that failed to parse
-  parsed_data <- compact(parsed_data)
-  
-  # Convert list columns to separate columns
-  parsed_data <- map(parsed_data, function(row) {
-    flat_row <- list()
-    for (name in names(row)) {
-      if (is.list(row[[name]])) {
-        values <- unlist(row[[name]])
-        for (i in seq_along(values)) {
-          flat_row[[paste(name, i, sep = "_")]] <- values[[i]]
-        }
-      } else {
-        flat_row[[name]] <- row[[name]]
-      }
-    }
-    return(flat_row)
-  })
-  
-  # Combine all parsed JSON objects into a single data frame
-  df <- bind_rows(parsed_data)
-  
-  return(df)
-}
 
 # Function to read trace files
 readTrace <- function(paths,
@@ -118,7 +63,7 @@ readTrace <- function(paths,
                       delim = "\t",
                       burnin = 0.1, 
                       check.names = FALSE, ...)
-  {
+{
   
   # Enforce argument matching
   if (!is.character(paths)) {
@@ -131,7 +76,7 @@ readTrace <- function(paths,
     stop("The following files do not exist:\n", paste(missing_files, collapse = "\n"))
   }
   
-  # Ensure format is either "simple" or "complex"
+  # Ensure format is either "simple" or "complex" or "json"
   format <- match.arg(format, choices = c("simple", "complex", "json"))
   if (!is.character(delim) || nchar(delim) != 1) {
     stop("Delimiter must be a single character string.")
@@ -191,15 +136,4 @@ readTrace <- function(paths,
     return(output[[1]])
   }
 }
-  
-  
-  # Example usage:
-   file <- readline(prompt = "Enter file path to JSON :")
-   parsed_df <- readAndParseJSON(file)
-  
-  
-  # View the parsed and unnested data frame
-   View(parsed_df)
-
-
 
