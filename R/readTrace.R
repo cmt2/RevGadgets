@@ -1,10 +1,6 @@
 # Load necessary libraries
-library(tidyverse)
 library(jsonlite)
 library(dplyr)
-
-# Source the read_and_parse_json.R file to load readAndParseJSON function
-source("R/read_parse_json.R")
 
 #' Read trace
 #'
@@ -30,10 +26,10 @@ source("R/read_parse_json.R")
 #' syntactically invalid characters.
 #' @param ... (various) Additional arguments passed to utils::read.table().
 #'
-#' @return List of dataframes .
+#' @return List of dataframes.
 #'
-#' 
-#'  \donttest{
+#' @examples
+#' \donttest{
 #' # How to call the function
 #' output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
 #'                     format = "json",
@@ -48,27 +44,22 @@ source("R/read_parse_json.R")
 #'   cat("\n")
 #' }
 #' # Example usage:
-file <- file.choose()
-
-if(length(file) == 0) {
-  stop("No file is imported")
-}
-
-
-parsed_df <- readAndParseJSON(file)
-# View the parsed and unnested data frame
-
-
-
-# Function to read trace files
+#' file <- file.choose()
+#' 
+#' if(length(file) == 0) {
+#'   stop("No file is imported")
+#' }
+#' parsed_df <- readAndParseJSON(file)
+#' # View the parsed and unnested data frame
+#' View(parsed_df)
+#' }
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
                       burnin = 0.1, 
-                      check.names = FALSE, ...)
-{
+                      check.names = FALSE, ...) {
   
-  # Enforce argument matching
+  # Enforce argument matching and checks
   if (!is.character(paths)) {
     stop("All paths must be character strings.")
   }
@@ -89,7 +80,7 @@ readTrace <- function(paths,
   }
   
   # Helper function to read data based on file extension
-  read_data <- function(path,format, delim, check.names, ...) {
+  read_data <- function(path, format, delim, check.names, ...) {
     if (format == "json") {
       return(readAndParseJSON(path))
     } else {
@@ -105,7 +96,7 @@ readTrace <- function(paths,
   
   # Check that the file headings match for all traces
   headers <- lapply(paths, function(path) {
-    data <- read_data(path,format, delim, check.names, nrows = 0, ...)
+    data <- read_data(path, format, delim, check.names, nrows = 0, ...)
     colnames(data)
   })
   unique_headers <- unique(headers)
@@ -116,7 +107,7 @@ readTrace <- function(paths,
   # Read in the traces
   output <- lapply(paths, function(path) {
     message(paste0("Reading log file: ", path))
-    data <- read_data(path, format,  delim, check.names, ...)
+    data <- read_data(path, format, delim, check.names, ...)
     
     # Apply burnin if specified
     if (burnin >= nrow(data)) {
@@ -139,5 +130,3 @@ readTrace <- function(paths,
     return(output[[1]])
   }
 }
-
-View(parsed_df)
