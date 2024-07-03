@@ -62,6 +62,7 @@ readTrace <- function(paths,
   # Enforce argument matching and checks
   if (!is.character(paths)) {
     stop("All paths must be character strings.")
+    
   }
   
   # Check if files exist
@@ -82,7 +83,7 @@ readTrace <- function(paths,
   # Helper function to read data based on file extension
   read_data <- function(path, format, delim, check.names, ...) {
     if (format == "json") {
-      return(readAndParseJSON(path))
+      return(readAndParseJSON(path))#calls the funciton
     } else {
       return(utils::read.table(
         file = path,
