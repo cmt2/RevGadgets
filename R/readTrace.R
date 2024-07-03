@@ -48,12 +48,15 @@ source("R/read_parse_json.R")
 #'   cat("\n")
 #' }
 #' # Example usage:
-file <- readline(prompt= "Enter file path to JSONfile  :")
+file <- file.choose()
+
+if(length(file) == 0) {
+  stop("No file is imported")
+}
+
+
 parsed_df <- readAndParseJSON(file)
 # View the parsed and unnested data frame
-View(parsed_df)
-
-
 
 
 
@@ -137,3 +140,4 @@ readTrace <- function(paths,
   }
 }
 
+View(parsed_df)
