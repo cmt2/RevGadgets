@@ -24,29 +24,15 @@
 #'
 #' @return List of dataframes (of length 1 if only 1 log file provided).
 #'
-#'#' @examples
+#' @examples
 #' # read and process a single trace file
-
+#' # file <- "simple/part_run_1.log"
+#' # parsed_df <- readAndParseJSON(file)
+#' # View(parsed_df)
+#'
 
 # Load necessary libraries
-library(tidyverse)
 library(jsonlite)
-
-# Load your JSON parsing function from the separate file
-source("R/json_utils.R")
-
-# Prompt user to choose a file
-file <- file.choose()
-#file <- ("simple/part_run_1.log")
-
-# Check if a file was selected
-if (length(file) == 0) {
-  stop("No file selected. Operation aborted.")
-}
-
-parsed_df <- readAndParseJSON(file)
-
-
 
 # Function to read trace files
 readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, check.names = FALSE, ...) {
@@ -54,6 +40,21 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
   if (!is.character(paths)) {
     stop("All paths must be character strings.")
   }
+  
+  #------
+  
+  # Prompt user to choose a file
+  file <- file.choose()
+  
+  # Check if a file was selected
+  if (length(file) == 0) {
+    stop("No file selected. Operation aborted.")
+  }
+  
+  # Call your function to read and parse JSON
+  parsed_df <- readAndParseJSON(file)
+  
+#-------
   
   # Check if files exist
   if (!all(file.exists(paths))) {
@@ -124,6 +125,5 @@ readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, chec
   }
 }
 
-# View the parsed and unnested data frame
-View(parsed_df)
+
 
