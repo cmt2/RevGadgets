@@ -1,6 +1,7 @@
 
 library(jsonlite)
 library(dplyr)
+library(tidyverse)
 
 # Function to read and parse JSON lines file
 readAndParseJSON <- function(file) {
