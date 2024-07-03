@@ -1,7 +1,3 @@
-# Load necessary libraries for readAndParseJSON
-library(jsonlite)
-library(dplyr)
-
 # Function to read and parse JSON lines file
 readAndParseJSON <- function(file) {
   # Function to safely parse each line of JSON
@@ -37,8 +33,8 @@ readAndParseJSON <- function(file) {
     }
   }
   
-  # Filter out any NULL values that failed to parse(it comes from purrr)
-  parsed_data <- compact(parsed_data)
+  # Filter out any NULL values that failed to parse
+  parsed_data <- purrr::compact(parsed_data)
   
   # Convert list columns to separate columns
   parsed_data <- map(parsed_data, function(row) {

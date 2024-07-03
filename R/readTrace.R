@@ -1,7 +1,3 @@
-# Load necessary libraries
-library(jsonlite)
-library(dplyr)
-
 #' Read trace
 #'
 #' Reads in MCMC log files or JSON files
@@ -25,10 +21,10 @@ library(dplyr)
 #' indicates if utils::read.table() should check column names and replace
 #' syntactically invalid characters.
 #' @param ... (various) Additional arguments passed to utils::read.table().
-#' 
-#'
+#' @param json (character) Path to the JSON file. Used only when `format = "json"`.
+#' Specify the path to the JSON file to be read and parsed into a data frame.
 #' @return List of dataframes.
-#'
+#' @export
 #' @examples
 #' \donttest{
 #' # How to call the function
@@ -37,7 +33,7 @@ library(dplyr)
 #'                     delim = "\t",
 #'                     burnin = 0.1,
 #'                     check.names = FALSE)
-#' 
+#'
 #' # Display formatted output using a loop
 #' for (i in seq_along(output)) {
 #'   cat(paste("File", i, "\n"))
@@ -46,7 +42,7 @@ library(dplyr)
 #' }
 #' # Example usage:
 #' file <- file.choose()
-#' 
+#'
 #' if(length(file) == 0) {
 #'   stop("No file is imported")
 #' }
@@ -57,7 +53,7 @@ library(dplyr)
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
-                      burnin = 0.1, 
+                      burnin = 0.1,
                       check.names = FALSE, ...) {
   
   # Enforce argument matching and checks
