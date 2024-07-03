@@ -19,7 +19,8 @@ file.}
 
 \item{format}{(single character string; default = "simple") Indicates type of
 MCMC trace, complex indicates cases where trace contains vectors of vectors/
-matrices - mnStochasticVariable monitor will sometimes be of this type.}
+matrices - mnStochasticVariable monitor will sometimes be of this type. When
+`format = "json"`, the log will be parsed as a JSON file.}
 
 \item{delim}{(single character string; default = "\t") Delimiter of file.}
 
