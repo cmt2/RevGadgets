@@ -32,7 +32,11 @@
 #'
 
 # Load necessary libraries
+if (!requireNamespace("jsonlite", quietly = TRUE)) {
+  install.packages("jsonlite")
+}
 library(jsonlite)
+
 
 # Function to read trace files
 readTrace <- function(paths, format = "simple", delim = "\t", burnin = 0.1, check.names = FALSE, ...) {
