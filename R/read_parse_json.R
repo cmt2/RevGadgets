@@ -37,7 +37,7 @@ readAndParseJSON <- function(file) {
     }
   }
   
-  # Filter out any NULL values that failed to parse
+  # Filter out any NULL values that failed to parse(it comes from purrr)
   parsed_data <- compact(parsed_data)
   
   # Convert list columns to separate columns
