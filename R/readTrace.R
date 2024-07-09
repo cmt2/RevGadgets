@@ -95,13 +95,11 @@ readTrace <- function(paths,
   # Ensure format is either "simple" or "complex" or "json"
   format <- match.arg(format, choices = c("simple", "complex", "json"))
   
-  if (is.character(delim) == FALSE)
+  if (!is.character(delim) || nchar(delim) != 1)
     stop("delim must be a single character string")
   
-  if (is.numeric(burnin) == FALSE)
-    stop("burnin must be a single numeric value")
-  if (burnin < 0)
-    stop("burnin must be a positive value")
+  if (!is.numeric(burnin) || burnin < 0)
+    stop("burnin must be a single positive numeric value")
   
   num_paths <- length(paths)
   
@@ -127,7 +125,7 @@ readTrace <- function(paths,
   
   all_headers <- unique(unlist(header))
   for (i in seq_len(length(header))) {
-    if (setequal(all_headers, header[[i]]) == FALSE) {
+    if (!setequal(all_headers, header[[i]])) {
       stop("Not all headers of trace files match")
     }
   }
@@ -142,6 +140,8 @@ readTrace <- function(paths,
     if (format == "json") {
       out <- jsonlite::fromJSON(paths[i])
       out <- as.data.frame(out)
+    } else if (format == "complex") {
+      stop("Complex trace type currently not supported")
     } else {
       out <- utils::read.table(
         file = paths[i],
@@ -165,6 +165,11 @@ readTrace <- function(paths,
     } else {
       stop("Invalid burnin value")
     }
+  }
+  
+  # Add handling for readAndParseJSON if needed outside the loop
+  if (format == "json") {
+    return(readAndParseJSON(paths))
   }
   
   return(output)
