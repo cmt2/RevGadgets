@@ -1,9 +1,14 @@
-# Function to read and parse JSON lines file
+#' Read and Parse JSON lines file
+#' Internal function to read in JSON files
+#'
+#' @param file (character) File path to trace file.
+#' @return Data frame.
+#' @export
 readAndParseJSON <- function(file) {
   # Function to safely parse each line of JSON
   parse_json_safe <- function(line) {
     tryCatch(
-      fromJSON(line, simplifyVector = FALSE),
+      jsonlite::fromJSON(line, simplifyVector = FALSE),
       error = function(e) {
         message("Error parsing line: ", line)
         NULL
@@ -19,7 +24,7 @@ readAndParseJSON <- function(file) {
   # Function to check if a line is metadata
   is_metadata_line <- function(line) {
     tryCatch({
-      json <- fromJSON(line, simplifyVector = TRUE)
+      json <- jsonlite::fromJSON(line, simplifyVector = TRUE)
       any(names(json) %in% c("atomic", "fields", "format"))
     }, error = function(e) {
       return(FALSE)
@@ -37,10 +42,11 @@ readAndParseJSON <- function(file) {
   parsed_data <- purrr::compact(parsed_data)
   
   # Convert list columns to separate columns
-  parsed_data <- map(parsed_data, function(row) {
+  parsed_data <- purrr::map(parsed_data, function(row) {
     flat_row <- list()
     for (name in names(row)) {
       if (is.list(row[[name]])) {
+        # Flatten lists into individual columns
         values <- unlist(row[[name]])
         for (i in seq_along(values)) {
           flat_row[[paste(name, i, sep = "_")]] <- values[[i]]
@@ -53,7 +59,7 @@ readAndParseJSON <- function(file) {
   })
   
   # Combine all parsed JSON objects into a single data frame
-  df <- bind_rows(parsed_data)
+  df <- dplyr::bind_rows(parsed_data)
   message("Data frame created with ", nrow(df), " rows and ", ncol(df), " columns")
   
   return(df)
