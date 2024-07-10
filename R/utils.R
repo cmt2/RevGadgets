@@ -1063,7 +1063,8 @@ reorder_treedata <- function(tdObject, order = "postorder") {
     }
 
   }
-
   return(node_map[, 1:2])
-
+  
 }
+
+

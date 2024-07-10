@@ -25,9 +25,16 @@ readTrace(
 
 \item{check.names}{(logical) Indicates if column names should be checked and replaced (default: FALSE).}
 
+<<<<<<< HEAD
+\item{verbose}{(logical; default = TRUE) Print status of reading traces 
+to screen}
+
+\item{...}{(various) Additional arguments passed to utils::read.table().}
+=======
 \item{verbose}{(logical) Whether to display progress messages (default: TRUE).}
 
 \item{...}{(additional arguments) Passed to read.table() for file reading.}
+>>>>>>> mahesh
 }
 \value{
 List of data frames (of length 1 if only 1 log file provided).

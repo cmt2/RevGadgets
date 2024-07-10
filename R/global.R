@@ -10,4 +10,4 @@ utils::globalVariables(c("anc_state_1", "anc_state_1_pp", "anc_state_2",
                          "posterior", "Probability", "rate.name",
                          "start_state_1", "start_state_1_pp", "start_state_2",
                          "start_state_3", "State", "upper", "value", "Variable",
-                         "vx", "vy", "x", "y", "."))
+                         "vx", "vy", "x", "y", ".", "xend", "yend"))

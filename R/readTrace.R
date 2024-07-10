@@ -113,6 +113,15 @@ readTrace <- function(paths,
       stop("Not all headers of trace files match")
     }
   }
+
+  # read in the traces
+  if (format == "simple") {
+    for (i in 1:num_paths) {
+      if (verbose) {
+        message(paste0(paste0("Reading in log file ", i), "\n", sep = ""))
+      }
+    }
+
   
   # Read in the traces
   output <- vector("list", num_paths)
@@ -136,6 +145,7 @@ readTrace <- function(paths,
         ...
       )
     }
+
     
     # Discard burn-in generations
     if (burnin >= nrow(out)) {
@@ -153,6 +163,7 @@ readTrace <- function(paths,
       stop("Invalid burnin value")
     }
   }
+}
   
   # Return list of data frames
   return(output)
