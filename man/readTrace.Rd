@@ -15,86 +15,39 @@ readTrace(
 )
 }
 \arguments{
-\item{paths}{(vector of character strings; no default) File path(s) to trace
-file.}
+\item{paths}{(character vector) File path(s) to trace file(s).}
 
-\item{format}{(single character string; default = simple) Indicates type of
-MCMC trace, complex indicates cases where trace contains vectors of vectors/
-matrices - mnStochasticVariable monitor will sometimes be of this type.}
+\item{format}{(character) Indicates type of MCMC trace. Options: "simple", "complex", "json".}
 
-\item{delim}{(single character string; default = "\\t") Delimiter of file.}
+\item{delim}{(character) Delimiter of file (default: "\t").}
 
-\item{burnin}{(single numeric value; default = 0.1) Fraction of generations
-to  discard (if value provided is between 0 and 1) or number of generations
-(if value provided is greater than 1).}
+\item{burnin}{(numeric) Fraction of generations to discard (if < 1) or number of generations (if >= 1) (default: 0.1).}
 
-\item{check.names}{(logical; default = FALSE) Passed to utils::read.table();
-indicates if utils::read.table() should check column names and replace
-syntactically invalid characters.}
+\item{check.names}{(logical) Indicates if column names should be checked and replaced (default: FALSE).}
 
+<<<<<<< HEAD
 \item{verbose}{(logical; default = TRUE) Print status of reading traces 
 to screen}
 
 \item{...}{(various) Additional arguments passed to utils::read.table().}
+=======
+\item{verbose}{(logical) Whether to display progress messages (default: TRUE).}
+
+\item{...}{(additional arguments) Passed to read.table() for file reading.}
+>>>>>>> mahesh
 }
 \value{
-List of dataframes (of length 1 if only 1 log file provided).
+List of data frames (of length 1 if only 1 log file provided).
 }
 \description{
-Reads in MCMC log files
-}
-\details{
-Reads in one or multiple MCMC log files from the same analysis
-and discards a user-specified burn-in, compatible with multiple monitor
-types. If the trace contains vectors of vectors and the user does not specify
-format = "complex", readTrace() will read in those columns as factors
-rather than as numeric vectors.
+Reads in MCMC log files and processes them according to specified parameters.
 }
 \examples{
-# read and process a single trace file
-
-\donttest{
-# download the example dataset to working directory
-url_gtr <-
-   "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR.log"
-dest_path_gtr <- "primates_cytb_GTR.log"
-download.file(url_gtr, dest_path_gtr)
-
-# to run on your own data, change this to the path to your data file
-file_single <- dest_path_gtr
-
-one_trace <- readTrace(paths = file_single)
-
-# remove file
-# WARNING: only run for example dataset!
-# otherwise you might delete your data!
-file.remove(dest_path_gtr)
-
-# read and process multiple trace files, such as from multiple runs of
-# the same analysis
-
-# download the example dataset to working directory
-url_1 <-
-"https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_1.log"
-dest_path_1 <- "primates_cytb_GTR_run_1.log"
-download.file(url_1, dest_path_1)
-
-url_2 <-
-"https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_2.log"
-dest_path_2 <- "primates_cytb_GTR_run_2.log"
-download.file(url_2, dest_path_2)
-
-# to run on your own data, change this to the path to your data file
-file_1 <- dest_path_1
-file_2 <- dest_path_2
-
-# read in the multiple trace files
-multi_trace <- readTrace(path = c(file_1, file_2), burnin = 0.0)
-
-# remove files
-# WARNING: only run for example dataset!
-# otherwise you might delete your data!
-file.remove(dest_path_1, dest_path_2)
+\dontrun{
+# Example usage:
+file <- "../simple/part_run_1.log"
+parsed_df <- readTrace(file, format = "simple")
+View(parsed_df)  # View the parsed data frame
 }
 
 }
