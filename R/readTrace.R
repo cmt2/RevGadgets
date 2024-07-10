@@ -1,26 +1,57 @@
 #' Read trace
 #'
-#' Reads in MCMC log files and processes them according to specified parameters.
+#' Reads in MCMC log files or JSON files
 #'
-#' @param paths (character vector) File path(s) to trace file(s).
-#' @param format (character) Indicates type of MCMC trace. Options: "simple", "complex", "json".
-#' @param delim (character) Delimiter of file (default: "\t").
-#' @param burnin (numeric) Fraction of generations to discard (if < 1) or number of generations (if >= 1) (default: 0.1).
-#' @param check.names (logical) Indicates if column names should be checked and replaced (default: FALSE).
+#' Reads in one or multiple MCMC log files from the same analysis
+#' and discards a user-specified burn-in, compatible with multiple monitor
+#' types. If the trace contains vectors of vectors and the user does not specify
+#' format = "complex", readTrace() will read in those columns as factors
+#' rather than as numeric vectors.
+#'
+#' @param paths (vector of character strings; no default) File path(s) to trace
+#' file.
+#' @param format (single character string; default = "simple") Indicates type of
+#' MCMC trace, complex indicates cases where trace contains vectors of vectors/
+#' matrices - mnStochasticVariable monitor will sometimes be of this type. When
+#' `format = "json"`, the log will be parsed as a JSON file.
+#' @param delim (single character string; default = "\t") Delimiter of file.
+#' @param burnin (single numeric value; default = 0.1) Fraction of generations
+#' to discard (if value provided is between 0 and 1) or number of generations
+#' (if value provided is greater than 1).
+#' @param check.names (logical; default = FALSE) Passed to utils::read.table();
 #' @param verbose (logical) Whether to display progress messages (default: TRUE).
 #' @param ... (additional arguments) Passed to read.table() for file reading.
 #'
 #' @return List of data frames (of length 1 if only 1 log file provided).
-#'
-#' @examples
-#' \dontrun{
-#' # Example usage:
-#' file <- "../simple/part_run_1.log"
-#' parsed_df <- readTrace(file, format = "simple")
-#' View(parsed_df)  # View the parsed data frame
-#' }
-#'
 #' @export
+#' @examples
+#' \donttest{
+#' # How to call the function
+#' output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
+#'                     format = "json",
+#'                     delim = "\t",
+#'                     burnin = 0.1,
+#'                     check.names = FALSE)
+#'
+#' # Display formatted output using a loop
+#' for (i in seq_along(output)) {
+#'   cat(paste("File", i, "\n"))
+#'   print(output[[i]], row.names = TRUE)
+#'   cat("\n")
+#' }
+#' # Example usage:
+#' file <- file.choose()
+#'
+#' if(length(file) == 0) {
+#'   stop("No file is imported")
+#' }
+#' parsed_df <- readAndParseJSON(file)
+#' # View the parsed and unnested data frame
+#' View(parsed_df)
+#' }
+
+
+
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
