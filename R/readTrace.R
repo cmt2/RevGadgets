@@ -23,7 +23,6 @@
 #' @param ... (additional arguments) Passed to read.table() for file reading.
 #'
 #' @return List of data frames (of length 1 if only 1 log file provided).
-#' @export
 #' @examples
 #' \donttest{
 #' # How to call the function
@@ -49,8 +48,6 @@
 #' # View the parsed and unnested data frame
 #' View(parsed_df)
 #' }
-
-
 
 readTrace <- function(paths,
                       format = "simple",
@@ -153,13 +150,6 @@ readTrace <- function(paths,
     } else {
       stop("Invalid burnin value")
     }
-  }
-  
-  # Combine the data frames if there are multiple files
-  if (num_paths > 1) {
-    output <- do.call(rbind, output)
-  } else {
-    output <- output[[1]]
   }
   
   # Return list of data frames
