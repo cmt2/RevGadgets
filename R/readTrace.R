@@ -14,13 +14,18 @@
 #' MCMC trace, complex indicates cases where trace contains vectors of vectors/
 #' matrices - mnStochasticVariable monitor will sometimes be of this type. When
 #' `format = "json"`, the log will be parsed as a JSON file.
-#' @param delim (single character string; default = "\t") Delimiter of file.
+#' @param delim (single character string; default = "\\t") Delimiter of file.
 #' @param burnin (single numeric value; default = 0.1) Fraction of generations
 #' to discard (if value provided is between 0 and 1) or number of generations
 #' (if value provided is greater than 1).
 #' @param check.names (logical; default = FALSE) Passed to utils::read.table();
-#' @param verbose (logical) Whether to display progress messages (default: TRUE).
-#' @param ... (additional arguments) Passed to read.table() for file reading.
+#' indicates if utils::read.table() should check column names and replace
+#' syntactically invalid characters.
+#' @param verbose (logical; default = TRUE) Print status of reading traces 
+#' to screen
+#' @param ... (various) Additional arguments passed to utils::read.table().
+#'
+#' @return List of dataframes (of length 1 if only 1 log file provided).
 #'
 #' @return List of data frames (of length 1 if only 1 log file provided).
 #' @examples
@@ -28,7 +33,7 @@
 #' # How to call the function
 #' output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
 #'                     format = "json",
-#'                     delim = "\t",
+#'                     delim = "\\t",
 #'                     burnin = 0.1,
 #'                     check.names = FALSE)
 #'
@@ -44,15 +49,12 @@
 #' if(length(file) == 0) {
 #'   stop("No file is imported")
 #' }
-#' parsed_df <- readAndParseJSON(file)
-#' # View the parsed and unnested data frame
-#' View(parsed_df)
 #' }
 
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
-                      burnin = 0,
+                      burnin = 0.1,
                       check.names = FALSE,
                       verbose = TRUE,
                       ...) {
