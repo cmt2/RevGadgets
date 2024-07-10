@@ -76,7 +76,7 @@
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
-                      burnin = 0,
+                      burnin = 0.1,
                       check.names = FALSE,
                       verbose = TRUE,
                       ...) {
