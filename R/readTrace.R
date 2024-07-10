@@ -14,7 +14,7 @@
 #' MCMC trace, complex indicates cases where trace contains vectors of vectors/
 #' matrices - mnStochasticVariable monitor will sometimes be of this type. When
 #' `format = "json"`, the log will be parsed as a JSON file.
-#' @param delim (single character string; default = "\t") Delimiter of file.
+#' @param delim (single character string; default = "\\t") Delimiter of file.
 #' @param burnin (single numeric value; default = 0.1) Fraction of generations
 #' to discard (if value provided is between 0 and 1) or number of generations
 #' (if value provided is greater than 1).
@@ -33,7 +33,7 @@
 #' # How to call the function
 #' output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
 #'                     format = "json",
-#'                     delim = "\t",
+#'                     delim = "\\t",
 #'                     burnin = 0.1,
 #'                     check.names = FALSE)
 #'
@@ -116,11 +116,11 @@ readTrace <- function(paths,
 
   # read in the traces
   if (format == "simple") {
-    output <- vector("list", num_paths)
     for (i in 1:num_paths) {
       if (verbose) {
         message(paste0(paste0("Reading in log file ", i), "\n", sep = ""))
       }
+    }
 
   
   # Read in the traces
@@ -145,6 +145,7 @@ readTrace <- function(paths,
         ...
       )
     }
+
     
     # Discard burn-in generations
     if (burnin >= nrow(out)) {
@@ -162,6 +163,7 @@ readTrace <- function(paths,
       stop("Invalid burnin value")
     }
   }
+}
   
   # Return list of data frames
   return(output)
