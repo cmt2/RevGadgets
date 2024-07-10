@@ -71,7 +71,7 @@
 #'                         "stoch_map_test_tmp/tree.nexus",
 #'                         package="RevGadgets")
 #'                         
-#' tree <- readTrees(treefile)[[1]][[1]]
+#' tree <- readTrees(treefile)
 #' 
 #' # process samples
 #' mapsfile <- system.file("extdata",
@@ -113,7 +113,7 @@ plotStochMaps <- function(tree,
                           time_bars = timeline,
                           label_sampled_ancs = FALSE,
                           ...) {
-  
+
   # pull tree from list object if necessary
   if (inherits(tree,"list")) {
     if (length(tree) == 1){
@@ -170,6 +170,9 @@ plotStochMaps <- function(tree,
   )
 
   if (colors[1] != "default") {
+    # error checking
+    if (is.null(names(colors))) 
+      {stop("colors must be a NAMED vector of colors where names correspond to the character states")}
     states <- names(colors)
   } else {
     states <- colnames(maps)[-c(1:5)]
