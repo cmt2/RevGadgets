@@ -23,7 +23,7 @@ MCMC trace, complex indicates cases where trace contains vectors of vectors/
 matrices - mnStochasticVariable monitor will sometimes be of this type. When
 `format = "json"`, the log will be parsed as a JSON file.}
 
-\item{delim}{(single character string; default = "\t") Delimiter of file.}
+\item{delim}{(single character string; default = "\\t") Delimiter of file.}
 
 \item{burnin}{(single numeric value; default = 0.1) Fraction of generations
 to discard (if value provided is between 0 and 1) or number of generations
@@ -62,7 +62,7 @@ write.table(data.frame(a = 21:30, b = 31:40), file = temp_file2, sep = "\t", row
 # How to call the function
 output <- readTrace(paths = c(temp_file1, temp_file2),
                     format = "simple",
-                    delim = "\t",
+                    delim = "\\\\t",
                     burnin = 0.1,
                     check.names = FALSE)
 
