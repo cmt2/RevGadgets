@@ -20,10 +20,9 @@ file.}
 
 \item{format}{(single character string; default = "simple") Indicates type of
 MCMC trace, complex indicates cases where trace contains vectors of vectors/
-matrices - mnStochasticVariable monitor will sometimes be of this type. When
-`format = "json"`, the log will be parsed as a JSON file.}
+matrices - mnStochasticVariable monitor will sometimes be of this type.}
 
-\item{delim}{(single character string; default = "\t") Delimiter of file.}
+\item{delim}{(single character string; default = "\\t") Delimiter of file.}
 
 \item{burnin}{(single numeric value; default = 0.1) Fraction of generations
 to discard (if value provided is between 0 and 1) or number of generations
@@ -34,7 +33,7 @@ indicates if utils::read.table() should check column names and replace
 syntactically invalid characters.}
 
 \item{verbose}{(logical; default = TRUE) Print status of reading traces 
-to screen}
+to screen.}
 
 \item{...}{(various) Additional arguments passed to utils::read.table().}
 }
@@ -42,7 +41,7 @@ to screen}
 List of dataframes (of length 1 if only 1 log file provided).
 }
 \description{
-Reads in MCMC log files or JSON files
+Reads in MCMC log files
 }
 \details{
 Reads in one or multiple MCMC log files from the same analysis
@@ -53,25 +52,49 @@ rather than as numeric vectors.
 }
 \examples{
 \donttest{
-# How to call the function
-output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
-                    format = "json",
-                    delim = "\t",
-                    burnin = 0.1,
-                    check.names = FALSE)
+# read and process a single trace file
 
-# Display formatted output using a loop
-for (i in seq_along(output)) {
-  cat(paste("File", i, "\n"))
-  print(output[[i]], row.names = TRUE)
-  cat("\n")
-}
-# Example usage:
-file <- file.choose()
+# download the example dataset to working directory
+url_gtr <-
+   "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR.log"
+dest_path_gtr <- "primates_cytb_GTR.log"
+download.file(url_gtr, dest_path_gtr)
 
-if(length(file) == 0) {
-  stop("No file is imported")
-}
+# to run on your own data, change this to the path to your data file
+file_single <- dest_path_gtr
+
+one_trace <- readTrace(paths = file_single)
+
+# remove file
+# WARNING: only run for example dataset!
+# otherwise you might delete your data!
+file.remove(dest_path_gtr)
+
+# read and process multiple trace files, such as from multiple runs of
+# the same analysis
+
+# download the example dataset to working directory
+url_1 <-
+"https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_1.log"
+dest_path_1 <- "primates_cytb_GTR_run_1.log"
+download.file(url_1, dest_path_1)
+
+url_2 <-
+"https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_2.log"
+dest_path_2 <- "primates_cytb_GTR_run_2.log"
+download.file(url_2, dest_path_2)
+
+# to run on your own data, change this to the path to your data file
+file_1 <- dest_path_1
+file_2 <- dest_path_2
+
+# read in the multiple trace files
+multi_trace <- readTrace(paths = c(file_1, file_2), burnin = 0.1)
+
+# remove files
+# WARNING: only run for example dataset!
+# otherwise you might delete your data!
+file.remove(dest_path_1, dest_path_2)
 }
 
 }

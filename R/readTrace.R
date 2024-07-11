@@ -10,24 +10,26 @@
 #'
 #' @param paths (vector of character strings; no default) File path(s) to trace
 #' file.
-#' @param format (single character string; default = simple) Indicates type of
+#' @param format (single character string; default = "simple") Indicates type of
 #' MCMC trace, complex indicates cases where trace contains vectors of vectors/
 #' matrices - mnStochasticVariable monitor will sometimes be of this type.
 #' @param delim (single character string; default = "\\t") Delimiter of file.
-#' @param burnin (single numeric value; default = 0) Fraction of generations
-#' to  discard (if value provided is between 0 and 1) or number of generations
+#' @param burnin (single numeric value; default = 0.1) Fraction of generations
+#' to discard (if value provided is between 0 and 1) or number of generations
 #' (if value provided is greater than 1).
 #' @param check.names (logical; default = FALSE) Passed to utils::read.table();
 #' indicates if utils::read.table() should check column names and replace
 #' syntactically invalid characters.
+#' @param verbose (logical; default = TRUE) Print status of reading traces 
+#' to screen.
 #' @param ... (various) Additional arguments passed to utils::read.table().
 #'
 #' @return List of dataframes (of length 1 if only 1 log file provided).
 #'
 #' @examples
+#' \donttest{
 #' # read and process a single trace file
 #'
-#' \donttest{
 #' # download the example dataset to working directory
 #' url_gtr <-
 #'    "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR.log"
@@ -63,7 +65,7 @@
 #' file_2 <- dest_path_2
 #'
 #' # read in the multiple trace files
-#' multi_trace <- readTrace(path = c(file_1, file_2), burnin = 0.0)
+#' multi_trace <- readTrace(paths = c(file_1, file_2), burnin = 0.1)
 #'
 #' # remove files
 #' # WARNING: only run for example dataset!
@@ -76,7 +78,7 @@
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
-                      burnin = 0,
+                      burnin = 0.1,
                       check.names = FALSE,
                       verbose = TRUE,
                       ...) {
