@@ -10,12 +10,12 @@
 #'
 #' @param paths (vector of character strings; no default) File path(s) to trace
 #' file.
-#' @param format (single character string; default = simple) Indicates type of
+#' @param format (single character string; default = "simple") Indicates type of
 #' MCMC trace, complex indicates cases where trace contains vectors of vectors/
 #' matrices - mnStochasticVariable monitor will sometimes be of this type. When
 #' `format = "json"`, the log will be parsed as a JSON file.
 #' matrices - mnStochasticVariable monitor will sometimes be of this type.
-#' @param delim (single character string; default = "\\t") Delimiter of file.
+#' @param delim (single character string; default = "\t") Delimiter of file.
 #' @param burnin (single numeric value; default = 0.1) Fraction of generations
 #' to  discard (if value provided is between 0 and 1) or number of generations
 #' (if value provided is greater than 1).
@@ -31,44 +31,21 @@
 #' @examples
 #' # read and process a single trace file
 #' \donttest{
+#' # Create dummy data
+#' temp_file1 <- tempfile(fileext = ".log")
+#' temp_file2 <- tempfile(fileext = ".log")
+#' write.table(data.frame(a = 1:10, b = 11:20), file = temp_file1, sep = "\t", row.names = FALSE)
+#' write.table(data.frame(a = 21:30, b = 31:40), file = temp_file2, sep = "\t", row.names = FALSE)
+#'
 #' # How to call the function
-#' output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
-#'                     format = "json",
-#'                     delim = "\\t",
+#' output <- readTrace(paths = c(temp_file1, temp_file2),
+#'                     format = "simple",
+#'                     delim = "\t",
 #'                     burnin = 0.1,
 #'                     check.names = FALSE)
-#' # download the example dataset to working directory
-#' url_gtr <-
-#'    "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR.log"
-#' dest_path_gtr <- "primates_cytb_GTR.log"
-#' download.file(url_gtr, dest_path_gtr)
-#' # to run on your own data, change this to the path to your data file
-#' file_single <- dest_path_gtr
-#' one_trace <- readTrace(paths = file_single)
-#' # remove file
-#' # WARNING: only run for example dataset!
-#' # otherwise you might delete your data!
-#' file.remove(dest_path_gtr)
-#' # read and process multiple trace files, such as from multiple runs of
-#' # the same analysis
-#' # download the example dataset to working directory
-#' url_1 <-
-#' "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_1.log"
-#' dest_path_1 <- "primates_cytb_GTR_run_1.log"
-#' download.file(url_1, dest_path_1)
-#' url_2 <-
-#' "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_2.log"
-#' dest_path_2 <- "primates_cytb_GTR_run_2.log"
-#' download.file(url_2, dest_path_2)
-#' # to run on your own data, change this to the path to your data file
-#' file_1 <- dest_path_1
-#' file_2 <- dest_path_2
-#' # read in the multiple trace files
-#' multi_trace <- readTrace(path = c(file_1, file_2), burnin = 0.0)
-#' # remove files
-#' # WARNING: only run for example dataset!
-#' # otherwise you might delete your data!
-#' file.remove(dest_path_1, dest_path_2)
+#'
+#' # Clean up temporary files
+#' file.remove(temp_file1, temp_file2)
 #' }
 #'
 #' @export
