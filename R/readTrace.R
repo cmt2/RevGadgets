@@ -14,22 +14,20 @@
 #' MCMC trace, complex indicates cases where trace contains vectors of vectors/
 #' matrices - mnStochasticVariable monitor will sometimes be of this type. When
 #' `format = "json"`, the log will be parsed as a JSON file.
-#' matrices - mnStochasticVariable monitor will sometimes be of this type.
 #' @param delim (single character string; default = "\t") Delimiter of file.
 #' @param burnin (single numeric value; default = 0.1) Fraction of generations
-#' to  discard (if value provided is between 0 and 1) or number of generations
+#' to discard (if value provided is between 0 and 1) or number of generations
 #' (if value provided is greater than 1).
 #' @param check.names (logical; default = FALSE) Passed to utils::read.table();
 #' indicates if utils::read.table() should check column names and replace
 #' syntactically invalid characters.
 #' @param verbose (logical; default = TRUE) Print status of reading traces 
-#' to screen
+#' to screen.
 #' @param ... (various) Additional arguments passed to utils::read.table().
 #'
 #' @return List of dataframes (of length 1 if only 1 log file provided).
 #'
 #' @examples
-#' # read and process a single trace file
 #' \donttest{
 #' # Create dummy data
 #' temp_file1 <- tempfile(fileext = ".log")
@@ -49,7 +47,6 @@
 #' }
 #'
 #' @export
-
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
@@ -58,7 +55,6 @@ readTrace <- function(paths,
                       verbose = TRUE,
                       ...) {
   # enforce argument matching
-  
   character_paths_are_strings <- is.character(paths)
   if (any(character_paths_are_strings == FALSE) == TRUE) {
     # print out the ones that are not character strings
