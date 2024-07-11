@@ -16,7 +16,7 @@
 #' `format = "json"`, the log will be parsed as a JSON file.
 #' matrices - mnStochasticVariable monitor will sometimes be of this type.
 #' @param delim (single character string; default = "\\t") Delimiter of file.
-#' @param burnin (single numeric value; default = 0.1) Fraction of generations
+#' @param burnin (single numeric value; default = 0) Fraction of generations
 #' to  discard (if value provided is between 0 and 1) or number of generations
 #' (if value provided is greater than 1).
 #' @param check.names (logical; default = FALSE) Passed to utils::read.table();
@@ -30,13 +30,15 @@
 #'
 #' @examples
 #' # read and process a single trace file
+#' 
 #' \donttest{
 #' # How to call the function
 #' output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
 #'                     format = "json",
 #'                     delim = "\\t",
-#'                     burnin = 0.1,
+#'                     burnin = 0,
 #'                     check.names = FALSE)
+#'                     
 #' # download the example dataset to working directory
 #' url_gtr <-
 #'    "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR.log"
@@ -69,6 +71,7 @@
 #' # WARNING: only run for example dataset!
 #' # otherwise you might delete your data!
 #' file.remove(dest_path_1, dest_path_2)
+#' 
 #' }
 #'
 #' @export
@@ -76,7 +79,7 @@
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
-                      burnin = 0.1,
+                      burnin = 0,
                       check.names = FALSE,
                       verbose = TRUE,
                       ...) {
