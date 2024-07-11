@@ -1,6 +1,6 @@
 #' Read trace
 #'
-#' Reads in MCMC log files
+#' Reads in MCMC log files or JSON files
 #'
 #' Reads in one or multiple MCMC log files from the same analysis
 #' and discards a user-specified burn-in, compatible with multiple monitor
@@ -14,7 +14,7 @@
 #' MCMC trace, complex indicates cases where trace contains vectors of vectors/
 #' matrices - mnStochasticVariable monitor will sometimes be of this type. When
 #' `format = "json"`, the log will be parsed as a JSON file.
-#' @param delim (single character string; default = "\\t") Delimiter of file.
+#' @param delim (single character string; default = "\t") Delimiter of file.
 #' @param burnin (single numeric value; default = 0.1) Fraction of generations
 #' to discard (if value provided is between 0 and 1) or number of generations
 #' (if value provided is greater than 1).
@@ -22,31 +22,36 @@
 #' indicates if utils::read.table() should check column names and replace
 #' syntactically invalid characters.
 #' @param verbose (logical; default = TRUE) Print status of reading traces 
-#' to screen.
+#' to screen
 #' @param ... (various) Additional arguments passed to utils::read.table().
 #'
 #' @return List of dataframes (of length 1 if only 1 log file provided).
 #'
 #' @examples
 #' \donttest{
-#' # Create dummy data
-#' temp_file1 <- tempfile(fileext = ".log")
-#' temp_file2 <- tempfile(fileext = ".log")
-#' write.table(data.frame(a = 1:10, b = 11:20), file = temp_file1, sep = "\t", row.names = FALSE)
-#' write.table(data.frame(a = 21:30, b = 31:40), file = temp_file2, sep = "\t", row.names = FALSE)
-#'
 #' # How to call the function
-#' output <- readTrace(paths = c(temp_file1, temp_file2),
-#'                     format = "simple",
-#'                     delim = "\\t",
+#' output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
+#'                     format = "json",
+#'                     delim = "\t",
 #'                     burnin = 0.1,
 #'                     check.names = FALSE)
 #'
-#' # Clean up temporary files
-#' file.remove(temp_file1, temp_file2)
+#' # Display formatted output using a loop
+#' for (i in seq_along(output)) {
+#'   cat(paste("File", i, "\n"))
+#'   print(output[[i]], row.names = TRUE)
+#'   cat("\n")
+#' }
+#' # Example usage:
+#' file <- file.choose()
+#'
+#' if(length(file) == 0) {
+#'   stop("No file is imported")
+#' }
 #' }
 #'
 #' @export
+
 readTrace <- function(paths,
                       format = "simple",
                       delim = "\t",
@@ -54,61 +59,63 @@ readTrace <- function(paths,
                       check.names = FALSE,
                       verbose = TRUE,
                       ...) {
-  # enforce argument matching
-  character_paths_are_strings <- is.character(paths)
-  if (any(character_paths_are_strings == FALSE) == TRUE) {
-    # print out the ones that are not character strings
-    stop(
-      paste0("Some paths are not character strings:",
-             paste(paths[character_paths_are_strings == FALSE], collapse = ", "),
-             sep = "\n")
-    )
+  
+  # Ensure paths are character strings
+  if (!is.character(paths)) {
+    stop("All paths must be character strings.")
   }
   
-  do_files_exist <- file.exists(paths)
-  if (any(do_files_exist == FALSE) == TRUE) {
-    # print out paths to files that don't exist
-    stop(
-      paste0("Some files do not exist:",
-             paste(paths[do_files_exist == FALSE], collapse = ", "), sep = "\n")
-    )
+  # Check if files exist
+  if (!all(file.exists(paths))) {
+    missing_files <- paths[!file.exists(paths)]
+    stop("The following files do not exist:\n", paste(missing_files, collapse = "\n"))
   }
   
+  # Ensure format is valid
   format <- match.arg(format, choices = c("simple", "complex", "json"))
   
-  if (!is.character(delim))
+  # Validate delim
+  if (!is.character(delim) || nchar(delim) != 1) {
     stop("delim must be a single character string")
+  }
   
-  if (!is.numeric(burnin))
-    stop("burnin must be a single numeric value")
-  if (burnin < 0)
-    stop("burnin must be a positive value")
+  # Validate burnin
+  if (!is.numeric(burnin) || burnin < 0) {
+    stop("burnin must be a single non-negative numeric value")
+  }
   
   num_paths <- length(paths)
   
-  # check that the file headings match for all traces
+  # Check that the file headings match for all traces
   header <- vector("list", num_paths)
   for (i in seq_len(num_paths)) {
-    header[[i]] <- colnames(
-      utils::read.table(
-        file = paths[i],
-        header = TRUE,
-        sep = delim,
-        check.names = check.names,
-        nrows = 1,
-        ...
+    if (format == "json") {
+      # Use your custom function to read and parse JSON
+      json_data <- readAndParseJSON(paths[i])
+      header[[i]] <- names(json_data)
+    } else {
+      header[[i]] <- colnames(
+        utils::read.table(
+          file = paths[i],
+          header = TRUE,
+          sep = delim,
+          check.names = check.names,
+          nrows = 1,  # Read only the header row to check column names
+          ...
+        )
       )
-    )
+    }
   }
   
+  # Ensure all headers are identical
   all_headers <- unique(unlist(header))
-  for (i in seq_len(length(header))) {
-    if (!setequal(all_headers, header[[i]])) {
+  for (i in seq_len(num_paths)) {
+    if (!identical(all_headers, header[[i]])) {
       stop("Not all headers of trace files match")
     }
   }
   
-  # read in the traces
+  # Read in the traces
   output <- vector("list", num_paths)
   for (i in seq_len(num_paths)) {
     if (verbose) {

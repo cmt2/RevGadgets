@@ -23,7 +23,7 @@ MCMC trace, complex indicates cases where trace contains vectors of vectors/
 matrices - mnStochasticVariable monitor will sometimes be of this type. When
 `format = "json"`, the log will be parsed as a JSON file.}
 
-\item{delim}{(single character string; default = "\\t") Delimiter of file.}
+\item{delim}{(single character string; default = "\t") Delimiter of file.}
 
 \item{burnin}{(single numeric value; default = 0.1) Fraction of generations
 to discard (if value provided is between 0 and 1) or number of generations
@@ -34,7 +34,7 @@ indicates if utils::read.table() should check column names and replace
 syntactically invalid characters.}
 
 \item{verbose}{(logical; default = TRUE) Print status of reading traces 
-to screen.}
+to screen}
 
 \item{...}{(various) Additional arguments passed to utils::read.table().}
 }
@@ -42,7 +42,7 @@ to screen.}
 List of dataframes (of length 1 if only 1 log file provided).
 }
 \description{
-Reads in MCMC log files
+Reads in MCMC log files or JSON files
 }
 \details{
 Reads in one or multiple MCMC log files from the same analysis
@@ -53,21 +53,25 @@ rather than as numeric vectors.
 }
 \examples{
 \donttest{
-# Create dummy data
-temp_file1 <- tempfile(fileext = ".log")
-temp_file2 <- tempfile(fileext = ".log")
-write.table(data.frame(a = 1:10, b = 11:20), file = temp_file1, sep = "\t", row.names = FALSE)
-write.table(data.frame(a = 21:30, b = 31:40), file = temp_file2, sep = "\t", row.names = FALSE)
-
 # How to call the function
-output <- readTrace(paths = c(temp_file1, temp_file2),
-                    format = "simple",
-                    delim = "\\\\t",
+output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
+                    format = "json",
+                    delim = "\t",
                     burnin = 0.1,
                     check.names = FALSE)
 
-# Clean up temporary files
-file.remove(temp_file1, temp_file2)
+# Display formatted output using a loop
+for (i in seq_along(output)) {
+  cat(paste("File", i, "\n"))
+  print(output[[i]], row.names = TRUE)
+  cat("\n")
+}
+# Example usage:
+file <- file.choose()
+
+if(length(file) == 0) {
+  stop("No file is imported")
+}
 }
 
 }
