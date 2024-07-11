@@ -9,6 +9,7 @@
 #' rcauchy rnorm time
 #' @importFrom utils read.csv read.table setTxtProgressBar txtProgressBar
 #'
-#' @docType package
+#' 
 #' @name RevGadgets
-NULL
+#' @aliases RevGadgets
+"_PACKAGE"

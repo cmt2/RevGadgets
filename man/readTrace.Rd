@@ -20,6 +20,8 @@ file.}
 
 \item{format}{(single character string; default = simple) Indicates type of
 MCMC trace, complex indicates cases where trace contains vectors of vectors/
+matrices - mnStochasticVariable monitor will sometimes be of this type. When
+`format = "json"`, the log will be parsed as a JSON file.
 matrices - mnStochasticVariable monitor will sometimes be of this type.}
 
 \item{delim}{(single character string; default = "\\t") Delimiter of file.}
@@ -52,45 +54,41 @@ rather than as numeric vectors.
 }
 \examples{
 # read and process a single trace file
-
 \donttest{
+# How to call the function
+output <- readTrace(paths = c("simplerev/simple/part_run_1.log", "simplerev/simple/part_run_2.log"),
+                    format = "json",
+                    delim = "\\\\t",
+                    burnin = 0.1,
+                    check.names = FALSE)
 # download the example dataset to working directory
 url_gtr <-
    "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR.log"
 dest_path_gtr <- "primates_cytb_GTR.log"
 download.file(url_gtr, dest_path_gtr)
-
 # to run on your own data, change this to the path to your data file
 file_single <- dest_path_gtr
-
 one_trace <- readTrace(paths = file_single)
-
 # remove file
 # WARNING: only run for example dataset!
 # otherwise you might delete your data!
 file.remove(dest_path_gtr)
-
 # read and process multiple trace files, such as from multiple runs of
 # the same analysis
-
 # download the example dataset to working directory
 url_1 <-
 "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_1.log"
 dest_path_1 <- "primates_cytb_GTR_run_1.log"
 download.file(url_1, dest_path_1)
-
 url_2 <-
 "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR_run_2.log"
 dest_path_2 <- "primates_cytb_GTR_run_2.log"
 download.file(url_2, dest_path_2)
-
 # to run on your own data, change this to the path to your data file
 file_1 <- dest_path_1
 file_2 <- dest_path_2
-
 # read in the multiple trace files
 multi_trace <- readTrace(path = c(file_1, file_2), burnin = 0.0)
-
 # remove files
 # WARNING: only run for example dataset!
 # otherwise you might delete your data!
