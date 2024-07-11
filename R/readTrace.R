@@ -12,7 +12,9 @@
 #' file.
 #' @param format (single character string; default = "simple") Indicates type of
 #' MCMC trace, complex indicates cases where trace contains vectors of vectors/
-#' matrices - mnStochasticVariable monitor will sometimes be of this type.
+#' matrices - mnStochasticVariable monitor will sometimes be of this type. 
+#' Specifying "json" for this argument will cause the file to be interpreted as 
+#' "json" format.
 #' @param delim (single character string; default = "\\t") Delimiter of file.
 #' @param burnin (single numeric value; default = 0.1) Fraction of generations
 #' to discard (if value provided is between 0 and 1) or number of generations
