@@ -2,9 +2,42 @@
 % Please edit documentation in R/RevGadgets.R
 \docType{package}
 \name{RevGadgets}
+\alias{RevGadgets-package}
 \alias{RevGadgets}
 \title{RevGadgets}
 \description{
 This package provides functions to process and plot the output of RevBayes
 analyses.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/revbayes/RevGadgets}
+  \item \url{https://revbayes.github.io/tutorials/intro/revgadgets}
+  \item Report bugs at \url{https://github.com/revbayes/RevGadgets/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Carrie Tribble \email{ctribble09@gmail.com} (\href{https://orcid.org/0000-0001-7263-7885}{ORCID})
+
+Authors:
+\itemize{
+  \item Michael R. May
+  \item William A. Freyman
+  \item Michael J. Landis
+  \item Lim Jun Ying
+  \item Joelle Barido-Sottani
+  \item Andrew Magee
+  \item Bjorn Tore Kopperud
+  \item Sebastian Hohna
+  \item Ronja J. Billenstein
+}
+
+Other contributors:
+\itemize{
+  \item Nagashima Kengo [contributor]
+  \item Schliep Klaus [contributor]
+}
+
 }

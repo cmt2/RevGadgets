@@ -18,14 +18,16 @@ readTrace(
 \item{paths}{(vector of character strings; no default) File path(s) to trace
 file.}
 
-\item{format}{(single character string; default = simple) Indicates type of
+\item{format}{(single character string; default = "simple") Indicates type of
 MCMC trace, complex indicates cases where trace contains vectors of vectors/
-matrices - mnStochasticVariable monitor will sometimes be of this type.}
+matrices - mnStochasticVariable monitor will sometimes be of this type. 
+Specifying "json" for this argument will cause the file to be interpreted as 
+"json" format.}
 
 \item{delim}{(single character string; default = "\\t") Delimiter of file.}
 
 \item{burnin}{(single numeric value; default = 0.1) Fraction of generations
-to  discard (if value provided is between 0 and 1) or number of generations
+to discard (if value provided is between 0 and 1) or number of generations
 (if value provided is greater than 1).}
 
 \item{check.names}{(logical; default = FALSE) Passed to utils::read.table();
@@ -33,7 +35,7 @@ indicates if utils::read.table() should check column names and replace
 syntactically invalid characters.}
 
 \item{verbose}{(logical; default = TRUE) Print status of reading traces 
-to screen}
+to screen.}
 
 \item{...}{(various) Additional arguments passed to utils::read.table().}
 }
@@ -51,9 +53,9 @@ format = "complex", readTrace() will read in those columns as factors
 rather than as numeric vectors.
 }
 \examples{
+\donttest{
 # read and process a single trace file
 
-\donttest{
 # download the example dataset to working directory
 url_gtr <-
    "https://revbayes.github.io/tutorials/intro/data/primates_cytb_GTR.log"
@@ -89,7 +91,7 @@ file_1 <- dest_path_1
 file_2 <- dest_path_2
 
 # read in the multiple trace files
-multi_trace <- readTrace(path = c(file_1, file_2), burnin = 0.0)
+multi_trace <- readTrace(paths = c(file_1, file_2), burnin = 0.1)
 
 # remove files
 # WARNING: only run for example dataset!
