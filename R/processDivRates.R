@@ -208,15 +208,15 @@ processDivRates <- function(speciation_time_log = "",
     timeline <- seq(0.0, oldest_age, length.out = 100)
   }
   
-  z_lambda <- evaluate_timevarying_ratefunction(speciation_time_log, speciation_rate_log, timeline, burnin)
-  z_mu     <- evaluate_timevarying_ratefunction(extinction_time_log, extinction_rate_log, timeline, burnin)
+  z_lambda <- .evaluate_timevarying_ratefunction(speciation_time_log, speciation_rate_log, timeline, burnin)
+  z_mu     <- .evaluate_timevarying_ratefunction(extinction_time_log, extinction_rate_log, timeline, burnin)
   
   if (fossilization_time_log == ""){
     z_psi   <- NULL
     df_fossilization <- tibble::tibble()
   } else {
-    z_psi   <- evaluate_timevarying_ratefunction(fossilization_time_log, fossilization_rate_log, timeline, burnin)
-    df_fossilization <- make_summary(z_psi, "fossilization rate", timeline, summary, probs)
+    z_psi   <- .evaluate_timevarying_ratefunction(fossilization_time_log, fossilization_rate_log, timeline, burnin)
+    df_fossilization <- .make_summary(z_psi, "fossilization rate", timeline, summary, probs)
   }
   
   ## re-parameterizations 
@@ -224,10 +224,10 @@ processDivRates <- function(speciation_time_log = "",
   z_netdiv <- z_lambda - z_mu
   
   
-  df_speciation <- make_summary(z_lambda, "speciation rate", timeline, summary, probs)
-  df_mu <- make_summary(z_mu, "extinction rate", timeline, summary, probs)
-  df_relext <- make_summary(z_relext, "relative-extinction rate", timeline, summary, probs)
-  df_netdiv <- make_summary(z_netdiv, "net-diversification rate", timeline, summary, probs)
+  df_speciation <- .make_summary(z_lambda, "speciation rate", timeline, summary, probs)
+  df_mu <- .make_summary(z_mu, "extinction rate", timeline, summary, probs)
+  df_relext <- .make_summary(z_relext, "relative-extinction rate", timeline, summary, probs)
+  df_netdiv <- .make_summary(z_netdiv, "net-diversification rate", timeline, summary, probs)
   
   
   plotdata <- dplyr::bind_rows(df_speciation, df_mu, df_relext, df_netdiv, df_fossilization)
@@ -235,9 +235,9 @@ processDivRates <- function(speciation_time_log = "",
   return(plotdata)
 }
 
-evaluate_timevarying_ratefunction <- function(fpath_times, fpath_rates, timeline, burnin){
-  rates <- RevGadgets:::.readOutputFile(fpath_rates, burnin = burnin)
-  times <- RevGadgets:::.readOutputFile(fpath_times, burnin = burnin)
+.evaluate_timevarying_ratefunction <- function(fpath_times, fpath_rates, timeline, burnin){
+  rates <- .readOutputFile(fpath_rates, burnin = burnin)
+  times <- .readOutputFile(fpath_times, burnin = burnin)
   
   ## timevarying functions
   foos <- list()
@@ -263,7 +263,7 @@ evaluate_timevarying_ratefunction <- function(fpath_times, fpath_rates, timeline
   return(z)
 }
 
-make_summary <- function(z, item, timeline, summary, probs){
+.make_summary <- function(z, item, timeline, summary, probs){
   if (!(summary %in% c("median", "mean"))){
     stop("summary must be either median or mean")
   }
