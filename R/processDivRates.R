@@ -90,20 +90,22 @@ processDivRates <- function(speciation_time_log = "",
                             fossilization_rate_log = "",
                             burnin = 0.25,
                             probs = c(0.025, 0.975),
-                            summary = "median") {
+                            summary = "median",
+                            timeline = NULL
+                            ) {
   # enforce argument matching
   if (is.character(speciation_time_log) == FALSE)
-    stop("speciation_time_log must be a character string or vector of strings")
+    stop("speciation_time_log must be a string")
   if (is.character(speciation_rate_log) == FALSE)
-    stop("speciation_rate_log must be a character string or vector of strings")
+    stop("speciation_rate_log must be a string")
   if (is.character(extinction_time_log) == FALSE)
-    stop("extinction_time_log must be a character string or vector of strings")
+    stop("extinction_time_log must be a string")
   if (is.character(extinction_rate_log) == FALSE)
-    stop("extinction_rate_log must be a character string or vector of strings")
+    stop("extinction_rate_log must be a string")
   if (is.character(fossilization_time_log) == FALSE)
-    stop("fossilization_time_log must be a character string vector of strings")
+    stop("fossilization_time_log must be a string")
   if (is.character(fossilization_rate_log) == FALSE)
-    stop("fossilization_rate_log must be a character string vector of strings")
+    stop("fossilization_rate_log must be a string")
   
   # check that both fozzilization files are either provided or not provided
   if (fossilization_time_log != "" &
@@ -115,12 +117,12 @@ processDivRates <- function(speciation_time_log = "",
   
   # check if speciation times log file(s) exist
   do_speciation_time_log_exist <- file.exists(speciation_time_log)
-  if (any(do_speciation_time_log_exist == FALSE) == TRUE) {
+  if (any(!do_speciation_time_log_exist)) {
     # print out paths to files that don't exist
     stop(
       paste0(
         "Some speciation_time_log files do not exist:",
-        paste0("\t", speciation_time_log[do_speciation_time_log_exist == FALSE]),
+        paste0("\t", speciation_time_log[!do_speciation_time_log_exist]),
         sep = "\n"
       )
     )
@@ -128,12 +130,12 @@ processDivRates <- function(speciation_time_log = "",
   
   # check if speciation rates log file(s) exist
   do_speciation_rate_log_exist <- file.exists(speciation_rate_log)
-  if (any(do_speciation_rate_log_exist == FALSE) == TRUE) {
+  if (any(!do_speciation_rate_log_exist)) {
     # print out paths to files that don't exist
     stop(
       paste0(
         "Some speciation_rate_log files do not exist:",
-        paste0("\t", speciation_rate_log[do_speciation_rate_log_exist == FALSE]),
+        paste0("\t", speciation_rate_log[!do_speciation_rate_log_exist]),
         sep = "\n"
       )
     )
@@ -141,12 +143,12 @@ processDivRates <- function(speciation_time_log = "",
   
   # check if extinction times log file(s) exist
   do_extinction_time_log_exist <- file.exists(extinction_time_log)
-  if (any(do_extinction_time_log_exist == FALSE) == TRUE) {
+  if (any(!do_extinction_time_log_exist)) {
     # print out paths to files that don't exist
     stop(
       paste0(
         "Some extinction_time_log files do not exist:",
-        paste0("\t", extinction_time_log[do_extinction_time_log_exist == FALSE]),
+        paste0("\t", extinction_time_log[!do_extinction_time_log_exist]),
         sep = "\n"
       )
     )
@@ -154,12 +156,12 @@ processDivRates <- function(speciation_time_log = "",
   
   # check if extinction rates log file(s) exist
   do_extinction_rate_log_exist <- file.exists(extinction_rate_log)
-  if (any(do_extinction_rate_log_exist == FALSE) == TRUE) {
+  if (any(!do_extinction_rate_log_exist)) {
     # print out paths to files that don't exist
     stop(
       paste0(
         "Some extinction_rate_log files do not exist:",
-        paste0("\t", extinction_rate_log[do_extinction_rate_log_exist == FALSE]),
+        paste0("\t", extinction_rate_log[!do_extinction_rate_log_exist]),
         sep = "\n"
       )
     )
@@ -169,14 +171,13 @@ processDivRates <- function(speciation_time_log = "",
   if (fossilization_time_log != "") {
     do_fossilization_time_log_exist <-
       file.exists(fossilization_time_log)
-    if (any(do_fossilization_time_log_exist == FALSE) == TRUE) {
+    if (any(!do_fossilization_time_log_exist)) {
       # print out paths to files that don't exist
       stop(
         paste0(
           "Some fossilization_time_log files do not exist:",
           paste0("\t",
-                 fossilization_time_log[do_fossilization_time_log_exist ==
-                                          FALSE]),
+                 fossilization_time_log[!do_fossilization_time_log_exist]),
           sep = "\n"
         )
       )
@@ -185,139 +186,96 @@ processDivRates <- function(speciation_time_log = "",
   
   # check if fossilization rates log file(s) exist if provided
   if (fossilization_rate_log != "") {
-    do_fossilization_rate_log_exist <-
-      file.exists(fossilization_rate_log)
-    if (any(do_fossilization_rate_log_exist == FALSE) == TRUE) {
+    do_fossilization_rate_log_exist <- file.exists(fossilization_rate_log)
+    if (any(!do_fossilization_rate_log_exist)) {
       # print out paths to files that don't exist
       stop(
         paste0(
           "Some fossilization_rate_log files do not exist:",
           paste0("\t",
-                 fossilization_rate_log[do_fossilization_rate_log_exist ==
-                                          FALSE]),
+                 fossilization_rate_log[!do_fossilization_rate_log_exist]),
           sep = "\n"
         )
       )
     }
   }
+
+       
+  # timeline 
+  if (is.null(timeline)){
+    times <- RevGadgets:::.readOutputFile(speciation_time_log, burnin = burnin)
+    oldest_age <- max(sapply(times,max))
+    timeline <- seq(0.0, oldest_age, length.out = 100)
+  }
   
-  # read in log files as lists of data.frames with readTrace()
-  speciation_time <- readTrace(paths = speciation_time_log,
-                               burnin = burnin)
-  speciation_rate <- readTrace(paths = speciation_rate_log,
-                               burnin = burnin)
-  extinction_time <- readTrace(paths = extinction_time_log,
-                               burnin = burnin)
-  extinction_rate <- readTrace(paths = extinction_rate_log,
-                               burnin = burnin)
-  if (fossilization_time_log != "") {
-    fossilization_time <- readTrace(paths = fossilization_time_log,
-                                    burnin = burnin)
-    fossilization_rate <- readTrace(paths = fossilization_rate_log,
-                                    burnin = burnin)
+  z_lambda <- evaluate_timevarying_ratefunction(speciation_time_log, speciation_rate_log, timeline, burnin)
+  z_mu     <- evaluate_timevarying_ratefunction(extinction_time_log, extinction_rate_log, timeline, burnin)
+  
+  if (fossilization_time_log == ""){
+    z_psi   <- NULL
+    df_fossilization <- tibble::tibble()
   } else {
-    fossilization_time <- NULL
-    fossilization_rate <- NULL
+    z_psi   <- evaluate_timevarying_ratefunction(fossilization_time_log, fossilization_rate_log, timeline, burnin)
+    df_fossilization <- make_summary(z_psi, "fossilization rate", timeline, summary, probs)
   }
   
-  # check if all parameter types have the same number of log files
-  if (is.null(fossilization_time)) {
-    trace_lengths_same <- identical(
-      length(speciation_time),
-      length(speciation_rate),
-      length(extinction_time),
-      length(extinction_rate)
-    )
-  } else {
-    trace_lengths_same <- identical(
-      length(speciation_time),
-      length(speciation_rate),
-      length(extinction_time),
-      length(extinction_rate),
-      length(fossilization_time),
-      length(fossilization_rate)
-    )
-  }
+  ## re-parameterizations 
+  z_relext <- z_mu / z_lambda 
+  z_netdiv <- z_lambda - z_mu
   
-  if (trace_lengths_same == FALSE) {
-    stop("You must provide the same number of log files
-         for each parameter type.")
-  }
-  else if (trace_lengths_same == TRUE) {
-    if (length(speciation_time) == 0) {
-      stop("You must provide at least one log file per parameter type.")
-    } else if (length(speciation_time) > 1) {
-      stop("Currently, only one log file per parameter type is supported.")
-    } else if (length(speciation_time) == 1) {
-      # convert single item lists to data frames
-      speciation_time <- speciation_time[[1]]
-      speciation_rate <- speciation_rate[[1]]
-      extinction_time <- extinction_time[[1]]
-      extinction_rate <- extinction_rate[[1]]
-      
-      if (!is.null(fossilization_time)) {
-        fossilization_time <- fossilization_time[[1]]
-        fossilization_rate <- fossilization_rate[[1]]
-      }
-      
-      # add in dummy distribution of 0 for time in the present
-      speciation_time$`interval_times[0]` <-
-        rep(0, nrow(speciation_time))
-      extinction_time$`interval_times[0]` <-
-        rep(0, nrow(extinction_time))
-      if (!is.null(fossilization_time)) {
-        fossilization_time$`interval_times[0]` <-
-          rep(0, nrow(fossilization_time))
-      }
-      
-      # Calculate the net-diversification and relative-extinction rates
-      net_diversification_rate <-
-        as.matrix(speciation_rate[, grepl("speciation",
-                                          colnames(speciation_rate))]) -
-        as.matrix(extinction_rate[, grepl("extinction",
-                                          colnames(extinction_rate))])
-      
-      colnames(net_diversification_rate) <-
-        paste(
-          rep("net_div", times = ncol(net_diversification_rate)),
-          rep("[", times = ncol(net_diversification_rate)),
-          seq_len(ncol(net_diversification_rate)),
-          rep("]", times = ncol(net_diversification_rate)),
-          sep = ""
-        )
-      
-      relative_extinction_rate <-
-        as.matrix(extinction_rate[, grepl("extinction",
-                                          colnames(extinction_rate))]) /
-        as.matrix(speciation_rate[, grepl("speciation",
-                                          colnames(speciation_rate))])
-      
-      colnames(relative_extinction_rate) <-
-        paste(
-          rep("rel_ext", times = ncol(relative_extinction_rate)),
-          rep("[", times = ncol(relative_extinction_rate)),
-          seq_len(ncol(relative_extinction_rate)),
-          rep("]", times = ncol(relative_extinction_rate)),
-          sep = ""
-        )
-      
-      # return a list of processed data frames
-      rates <- list(
-        "speciation rate" = speciation_rate,
-        "extinction rate" = extinction_rate,
-        "net-diversification rate" = net_diversification_rate,
-        "relative-extinction rate" = relative_extinction_rate,
-        "fossilization rate" = fossilization_rate,
-        "speciation time" = speciation_time,
-        "extinction time" = extinction_time,
-        "fossilization time" = fossilization_time
-      )
-      
-      plotdata <-
-        .makePlotData(rates = rates,
-                      probs = probs,
-                      summary = summary)
-      return(plotdata)
+  
+  df_speciation <- make_summary(z_lambda, "speciation rate", timeline, summary, probs)
+  df_mu <- make_summary(z_mu, "extinction rate", timeline, summary, probs)
+  df_relext <- make_summary(z_relext, "relative-extinction rate", timeline, summary, probs)
+  df_netdiv <- make_summary(z_netdiv, "net-diversification rate", timeline, summary, probs)
+  
+  
+  plotdata <- dplyr::bind_rows(df_speciation, df_mu, df_relext, df_netdiv, df_fossilization)
+  
+  return(plotdata)
+}
+
+evaluate_timevarying_ratefunction <- function(fpath_times, fpath_rates, timeline, burnin){
+  rates <- RevGadgets:::.readOutputFile(fpath_rates, burnin = burnin)
+  times <- RevGadgets:::.readOutputFile(fpath_times, burnin = burnin)
+  
+  ## timevarying functions
+  foos <- list()
+  for (i in seq_along(rates)){
+    if (length(rates[[i]]) > 1){
+      f <- approxfun(times[[i]],
+                     utils::tail(rates[[i]], n = -1),
+                     yleft = rates[[i]][1],
+                     yright = utils::tail(rates[[i]], n = 1),
+                     method = "constant") ## assume piecewise-constant
+    }else{
+      f <- function(x) rates[[i]][1] + 0*x  #0*x is necessary, otherwise the function does not vectorize well
     }
+    foos[[i]] <- f
   }
+  
+  ## evaluate all functions (per iteration) on the timeline
+  ## z is a two-dimensional array with 
+  ## - rows: corresponding to the points on the time axis (according to timeline)
+  ## - columns: corresponding to the samples from the posterior distribution
+  z <- sapply(foos, function(f) f(timeline))
+  
+  return(z)
+}
+
+make_summary <- function(z, item, timeline, summary, probs){
+  if (!(summary %in% c("median", "mean"))){
+    stop("summary must be either median or mean")
+  }
+  middle <- apply(z, 1, summary)
+  uncertainty <- apply(z, 1, function(x) quantile(x, probs = probs))
+  
+  df <- tibble::tibble(
+    "time" = timeline,
+    "value" = middle,
+    "lower" = uncertainty[1,],
+    "upper" = uncertainty[2,],
+    "item" = item,
+  )
+  return(df)
 }

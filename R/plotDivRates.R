@@ -94,20 +94,16 @@
 plotDivRates <- function(rates, facet = TRUE){
   message("Using default time units in x-axis label: Age (Ma)")
   rates_to_plot <- unique(rates$item)[grep("rate", unique(rates$item))]
+  
   `%>%` <- dplyr::`%>%`
   
   p <- rates %>%
     subset(grepl("rate", item)) %>%
     ggplot2::ggplot(ggplot2::aes(time, value, color = item))  +
-    ggplot2::geom_step(ggplot2::aes(time, value),
-                       direction = "vh") +
-    geom_stepribbon(ggplot2::aes(x = time,
-                                 ymin = lower,
-                                 ymax = upper,
-                                 fill = item),
-                    direction = "vh",
-                    alpha = 0.4,
-                    color = NA) +
+    ggplot2::geom_line() +
+    ggplot2::geom_ribbon(aes(ymin = lower, ymax = upper, fill = item),
+                         alpha = 0.4,
+                         color = NA) +
     ggplot2::scale_x_reverse() +
     ggplot2::xlab("Age (Ma)") +
     ggplot2::ylab("Rate") +

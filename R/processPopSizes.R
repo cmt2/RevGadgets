@@ -60,7 +60,6 @@ processPopSizes <- function(population_size_log = "",
     stop("Exponential spacing of grid points can not be combined with a minimal age of 0. Please choose either equal spacing or a different min_age.")
   }
   
-  #recover()
   constant_dem = FALSE
   
   if (interval_change_points_log == ""){

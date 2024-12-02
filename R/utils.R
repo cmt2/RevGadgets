@@ -530,12 +530,12 @@
   
   `%>%` <- dplyr::`%>%`
   
-  res <- path %>% 
-    readLines() %>%
+  lines <- readLines(path, warn = FALSE)
+  
+  res <- lines %>% 
     utils::tail(n = -1)
   
-  names <- path %>% 
-    readLines() %>%
+  names <- lines %>% 
     utils::head(n = 1) %>%
     strsplit("\t")
   
