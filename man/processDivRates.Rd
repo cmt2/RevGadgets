@@ -13,7 +13,8 @@ processDivRates(
   fossilization_rate_log = "",
   burnin = 0.25,
   probs = c(0.025, 0.975),
-  summary = "median"
+  summary = "median",
+  timeline = NULL
 )
 }
 \arguments{
@@ -37,16 +38,18 @@ single character string; "") Path to fossilization rates log file(s)}
 
 \item{burnin}{(single numeric value; default = 0) Fraction of generations to
 discard (if value provided is between 0 and 1) or number of generations (if
-value provided is greater than 1). Passed to readTrace().}
+value provided is greater than 1). Passed to .readOutputFile().}
 
 \item{probs}{(numeric vector; c(0.025, 0.975)) a vector of length two
 containing the upper and lower bounds for the confidence intervals.}
 
 \item{summary}{typically "mean" or "median"; the metric to summarize the
 posterior distribution. Defaults to "median"}
+
+\item{timeline}{a sequence of time points for the x-axis, defaults to seq(0.0, oldest_timepoint, length.out = 100)}
 }
 \value{
-List object with processed rate and time parameters.
+a dataframe (tibble) with the processed rate and time parameters.
 }
 \description{
 Processing the output of a episodic diversification rate analysis with
@@ -59,7 +62,7 @@ Additionally, it assumes that times correspond to rates such that the first
 rate parameter (i.e. speciation[1]) corresponds to the present. Conversely,
 the first time parameter (i.e. interval_times[1]) corresponds to the first
 time interval after the present, moving backwards in time. processDivRates()
-relies on readTrace and produces a list object that can be read by
+relies on .readOutputFile() and produces a dataframe (tibble) that can be read by
 plotDivRates() to visualize the results. For now, only one log file per
 parameter type is accepted (i.e. log files from multiple runs must be
 combined before reading into the function).
