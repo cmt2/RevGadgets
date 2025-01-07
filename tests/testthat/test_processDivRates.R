@@ -30,5 +30,5 @@ test_that("processes birth-death scripts", {
         )
         expect_equal(ncol(primates), 5)
         expect_equal(class(primates), c("tbl_df", "tbl", "data.frame"))
-        expect_equal(nrow(primates), 66)
+        expect_equal(nrow(primates), 400)
 })
