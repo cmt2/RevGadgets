@@ -365,7 +365,7 @@ Imports: ape (>= 5.4), phytools (>= 0.7-70), dplyr (>= 1.0.0),
          ggtree (>= 3.6.1), tidytree (>= 0.3.4), treeio (>= 1.12.0),
          ggplot2 (>= 3.4.0), reshape (>= 0.8.8), methods (>= 4.1.0),
          tidyr (>= 1.1.0), tibble (>= 3.0.1), gginnards (>= 0.0.3),
-          ggplotify (>= 0.0.5), ggpp, ggimage, png (>= 0.1-7), 
+          ggplotify (>= 0.0.5), ggpp, png (>= 0.1-7), 
          stats (>= 4.0.1), utils (>= 4.0.1), grDevices (>= 4.0.1), 
          deeptime (>= 0.1.0), scales (>= 1.1.1)
 ```
