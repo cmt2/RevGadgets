@@ -4,13 +4,29 @@
 \alias{plotDivRates}
 \title{Plot Diversification Rates}
 \usage{
-plotDivRates(rates, facet = TRUE)
+plotDivRates(
+  rates,
+  env_age = NULL,
+  env_var = NULL,
+  env_label = "env_label",
+  env_scaling = 1,
+  facet = TRUE
+)
 }
 \arguments{
-\item{rates}{(list of dataframes; no default) A list of dataframes,
-such as produced by processDivRates(), containing the data on rates
-and interval times for each type of rate to be plotted (e.g.
-speciation rate, etc.).}
+\item{rates}{a dataframe, such as produced by processDivRates(),
+containing the data on rates and interval times for each type of 
+rate to be plotted (e.g. speciation rate, etc.).}
+
+\item{env_age}{(optional) a vector of time points for an environmental variable}
+
+\item{env_var}{(optional) a vector of values for an environmental variable}
+
+\item{env_label}{(optional) a label for the environmental variable}
+
+\item{env_scaling}{(optional) the ratio between the tick values for the 
+primary (left-hand, diversification rates) y-axis and the 
+secondary (right-hand, environmental variable) y-axis}
 
 \item{facet}{(logical; TRUE) plot rates in separate facets.}
 }
@@ -78,16 +94,31 @@ p <- p + ggplot2::scale_fill_manual(values = c("red",
                                                "green",
                                                "yellow",
                                                "purple")) +
-  ggplot2::scale_color_manual(values = c("red",
-                                         "green",
-                                         "yellow",
-                                         "purple"));p
+ggplot2::scale_color_manual(values = c("red",
+                                       "green",
+                                       "yellow",
+                                       "purple"));p
 
 # let's say we don't want to plot relative-extinction rate,
 # and use the same y-axis for all three rates
 rates <- rates[!grepl("relative-extinction", rates$item),]
 p2 <- plotDivRates(rates)
 p2 <- p2 + ggplot2::facet_wrap(ggplot2::vars(item), scale = "fixed");p2
+
+## suppose we want to add a secondary axis showing an environmental variable
+co2 <- c(297.6, 301.36, 304.84, 307.86, 310.36, 312.53, 314.48, 
+         316.31, 317.42, 317.63, 317.74, 318.51, 318.29, 316.5, 
+         315.49, 317.64, 318.61, 316.6, 317.77, 328.27, 351.12, 
+         381.87, 415.47, 446.86, 478.31, 513.77, 550.74, 586.68, 
+         631.48, 684.13, 725.83, 757.81, 789.39, 813.79, 824.25, 
+         812.6, 784.79, 755.25, 738.41, 727.53, 710.48, 693.55, 
+         683.04, 683.99, 690.93, 694.44, 701.62, 718.05, 731.95, 
+         731.56, 717.76)
+         
+co2_age <- seq(0.0, 50.0, length.out = length(co2))
+
+p3 <- plotDivRates(rates, env_age = co2_age, env_var = co2, 
+                   env_label = "co2 (ppm)", env_scaling = 1000)
 
 # remove files
 # WARNING: only run for example dataset!
